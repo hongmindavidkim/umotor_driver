@@ -5,4 +5,4 @@
 ../Core/Src/fsm.c:239:7:enter_menu_state	8	static
 ../Core/Src/fsm.c:255:7:enter_setup_state	24	static
 ../Core/Src/fsm.c:290:7:process_user_input	24	static
-../Core/Src/fsm.c:391:7:enter_motor_mode	4	static
+../Core/Src/fsm.c:392:7:enter_motor_mode	4	static

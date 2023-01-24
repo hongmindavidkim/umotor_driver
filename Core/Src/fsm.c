@@ -183,6 +183,9 @@
 	switch(fsmstate->state){
 		case MENU_MODE:
 			switch (fsm_input){
+				case MENU_CMD:
+					enter_menu_state(); // re-print menu
+					break;
 				case CAL_CMD:
 					fsmstate->next_state = CALIBRATION_MODE;
 					fsmstate->ready = 0;
@@ -261,7 +264,7 @@
 
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "j", "D-axis inductance (H)", "0", "0.1", L_D);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "e", "Q-axis inductance (H)", "0", "0.1", L_Q);
-	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "n", "Number of Pole Pairs (NPP)", "0", "40", PPAIRS);
+	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "n", "Number of Pole Pairs (NPP)", "0", "40", PPAIRS);
 
 	    printf("\r\n Control:\r\n");
 
@@ -345,9 +348,10 @@
 			 printf("L_Q set to %f\r\n", L_Q);
 			 break;
 		 case 'n':
-			 PPAIRS = atoi(fsmstate->cmd_buff);
-			 if (PPAIRS>40) {PPAIRS=40;}
-			 printf("PPAIRS set to %d\r\n", PPAIRS);
+			 PPAIRS = fmaxf(fminf(atof(fsmstate->cmd_buff), 40.0f), 0.0f);
+			 if (PPAIRS>40.0) {PPAIRS=40.0f;}
+			 PPAIRS = (float)( (int)PPAIRS ); // remove any decimal part
+			 printf("PPAIRS set to %f\r\n", PPAIRS);
 			 break;
 
 		 case 'x':

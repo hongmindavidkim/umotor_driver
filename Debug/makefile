@@ -60,8 +60,8 @@ all: main-build
 main-build: motor_driver_v2.elf secondary-outputs
 
 # Tool invocations
-motor_driver_v2.elf motor_driver_v2.map: $(OBJS) $(USER_OBJS) /home/saloutos/Code/STM_code/motor_driver_v2/STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "motor_driver_v2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/home/saloutos/Code/STM_code/motor_driver_v2/STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="motor_driver_v2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+motor_driver_v2.elf motor_driver_v2.map: $(OBJS) $(USER_OBJS) C:\Users\Owner\Documents\GitHub\motor_driver\STM32F446RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "motor_driver_v2.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Owner\Documents\GitHub\motor_driver\STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="motor_driver_v2.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
