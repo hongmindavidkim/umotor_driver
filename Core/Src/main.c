@@ -177,12 +177,16 @@ int main(void)
   if(isnan(I_CAL)||I_CAL==-1){I_CAL = 5.0f;}
   if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=0;}
 
+//  if(isnan(K_SCALE) || K_SCALE==-1){K_SCALE = 0.000133f;}
+//  if(isnan(KI_D) || KI_D==-1){KI_D = 0.0373f;}
+//  if(isnan(KI_Q) || KI_Q ==-1){KI_Q = 0.0373f;}
+
   if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
   if(isnan(GR) || GR==-1){GR = 6.0f;}
   if(isnan(KT) || KT==-1){KT = 1.0f;}
   if(isnan(L_D) || L_D==-1){L_D = 0.000003f;}
   if(isnan(L_Q) || L_Q==-1){L_Q = 0.000003f;}
-  if(isnan(R_PHASE) || R_PHASE==-1){R_PHASE = 0.0f;}
+  if(isnan(R_PHASE) || R_PHASE==-1){R_PHASE = 0.433f;}
   if(isnan(R_NOMINAL) || R_NOMINAL==-1){R_NOMINAL = 0.0f;}
 
   if(isnan(R_TH) || R_TH==-1){R_TH = 1.25f;}

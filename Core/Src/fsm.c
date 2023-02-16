@@ -298,7 +298,7 @@
 		printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Encoder Elec Zero", "0", "524288", E_ZERO);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "g", "Gear Ratio", "0", "-", GR);
 	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "k", "Torque Constant (N-m/A)", "0", "-", KT);
-	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Motor Phase Resistance (ohms)", "-", "-", R_PHASE);
+	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "o", "Motor Phase Resistance (ohms)", "0.0", "10.0", R_PHASE);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "j", "D-axis inductance (H)", "0", "0.1", L_D);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "e", "Q-axis inductance (H)", "0", "0.1", L_Q);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "n", "Number of Pole Pairs (NPP)", "0", "40", PPAIRS);
@@ -343,7 +343,7 @@
 //			 K_SCALE = fmaxf(fminf(atof(fsmstate->cmd_buff), 0.1f), 0.0f);
 //			 printf("K_SCALE set to %f\r\n", K_SCALE);
 //			 break;
-//		 case 'd':
+//		 case 'r':
 //			 KI_D = fmaxf(fminf(atof(fsmstate->cmd_buff), 1.0f), 0.0f);
 //			 printf("KI_D set to %f\r\n", KI_D);
 //			 break;
@@ -360,6 +360,10 @@
  			 EN_ENC_FILTER = atoi(fsmstate->cmd_buff);
  			 if (EN_ENC_FILTER!=0) { EN_ENC_FILTER = 1; }
 			 printf("EN_ENC_FILTER set to %d\r\n", EN_ENC_FILTER);
+			 break;
+ 		 case 'o':
+			 R_PHASE = fmaxf(fminf(atof(fsmstate->cmd_buff), 10.0f), 0.0f);
+			 printf("R_PHASE set to %f\r\n", R_PHASE);
 			 break;
 	 	 case 'b':
 			 I_BW = fmaxf(fminf(atof(fsmstate->cmd_buff), 2000.0f), 100.0f);
@@ -477,12 +481,16 @@
 	I_CAL = 5.0f;
 	I_FW_MAX=0;
 
+//	K_SCALE = 0.000133f;          // K_loop/Loop BW (Hz) 0.0042
+//	KI_D = 0.0373f;                // PI zero, in radians per sample
+//	KI_Q = 0.0373f;                // PI zero, in radians per sample
+
 	PPAIRS = 21.0f;
 	GR = 6.0f;
 	KT = 1.0f;
 	L_D = 0.000003f;
 	L_Q = 0.000003f;
-	R_PHASE = 0.0f;
+	R_PHASE = 0.433f;
 	R_NOMINAL = 0.0f;
 
 	R_TH = 1.25f;
