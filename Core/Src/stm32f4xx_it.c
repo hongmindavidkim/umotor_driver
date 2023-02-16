@@ -71,7 +71,7 @@
 extern TIM_HandleTypeDef htim1;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
-
+extern int loop_time;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -218,6 +218,10 @@ void TIM1_UP_TIM10_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 0 */
 	//HAL_GPIO_WritePin(LED, GPIO_PIN_SET );	// Useful for timing
 
+	// grab timer value and reset
+	loop_time = __HAL_TIM_GET_COUNTER(&htim3);
+	__HAL_TIM_SET_COUNTER(&htim3,0);  // set the counter value a 0
+
 	/* Sample ADCs */
 	analog_sample(&controller);
 
@@ -237,6 +241,9 @@ void TIM1_UP_TIM10_IRQHandler(void)
   /* USER CODE END TIM1_UP_TIM10_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_TIM10_IRQn 1 */
+
+
+
   /* USER CODE END TIM1_UP_TIM10_IRQn 1 */
 }
 
@@ -263,6 +270,7 @@ void can_tx_rx(void){
 
 	int no_mesage = HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
 	if(!no_mesage){
+//		printf("RX!\n\r");
 		uint32_t TxMailbox;
 		pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR);	// Pack response
 		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
@@ -284,4 +292,6 @@ void can_tx_rx(void){
 	}
 
 }
+
+
 /* USER CODE END 1 */

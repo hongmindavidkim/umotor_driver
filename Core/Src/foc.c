@@ -100,9 +100,27 @@ void svm(float v_max, float u, float v, float w, float *dtc_u, float *dtc_v, flo
     float v_offset = (fminf3(u, v, w) + fmaxf3(u, v, w))*0.5f;
     float v_midpoint = .5f*(DTC_MAX+DTC_MIN);
 
+    // TODO: add dead-time compensation code from Mbed motor driver version?
+//    // Dead-time compensation
+//	float u_comp = DTC_COMP*(-(i_sector==4) + (i_sector==3));
+//	float v_comp = DTC_COMP*(-(i_sector==2) + (i_sector==5));
+//	float w_comp = DTC_COMP*((i_sector==6) - (i_sector==1));
+
     *dtc_u = fast_fminf(fast_fmaxf((.5f*(u -v_offset)*OVERMODULATION/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
     *dtc_v = fast_fminf(fast_fmaxf((.5f*(v -v_offset)*OVERMODULATION/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
     *dtc_w = fast_fminf(fast_fmaxf((.5f*(w -v_offset)*OVERMODULATION/v_max + v_midpoint ), DTC_MIN), DTC_MAX);
+
+//    *dtc_u = fminf(fmaxf((.5f*(u -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f + u_comp), DTC_MIN), DTC_MAX);
+//	*dtc_v = fminf(fmaxf((.5f*(v -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f + v_comp), DTC_MIN), DTC_MAX);
+//	*dtc_w = fminf(fmaxf((.5f*(w -v_offset)/(v_bus*(DTC_MAX-DTC_MIN)) + (DTC_MAX+DTC_MIN)*.5f + w_comp), DTC_MIN), DTC_MAX);
+//
+//	/*
+//	sinusoidal pwm
+//	*dtc_u = fminf(fmaxf((u/v_bus + .5f), DTC_MIN), DTC_MAX);
+//	*dtc_v = fminf(fmaxf((v/v_bus + .5f), DTC_MIN), DTC_MAX);
+//	*dtc_w = fminf(fmaxf((w/v_bus + .5f), DTC_MIN), DTC_MAX);
+//	*/
+
 
     }
 
@@ -218,6 +236,7 @@ void field_weaken(ControllerStruct *controller)
        /// Field Weakening ///
 
        controller->fw_int += controller->ki_fw*(controller->v_max - controller->v_ref);
+//       controller->fw_int += .001f*(0.5f*OVERMODULATION*controller->v_bus - controller->v_ref); // from MBed code?
        controller->fw_int = fast_fmaxf(fast_fminf(controller->fw_int, 0.0f), -I_FW_MAX);
        controller->i_d_des = controller->fw_int;
        float q_max = sqrtf(controller->i_max*controller->i_max - controller->i_d_des*controller->i_d_des);

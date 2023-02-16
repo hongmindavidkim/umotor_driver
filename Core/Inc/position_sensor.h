@@ -18,6 +18,7 @@
 #define N_POS_SAMPLES 20		// Number of position samples to store.  should put this somewhere else...
 #define N_LUT 128
 #define LUT_SHIFT 12					// bits to shift for linearizing LUT
+#define LUT_MASK 0x0FFF
 
 typedef struct{
 	uint8_t spi_tx_buff[4];
@@ -29,6 +30,7 @@ typedef struct{
 	float vel_vec[N_POS_SAMPLES], single_vel;
 	int filt_enable;
 	int init_status;
+	int offset_interp, offset1, offset2, offset_ind1, offset_ind2;
 	int count, old_count, turns;
 	int count_buff[N_POS_SAMPLES];
 	int m_zero, e_zero;

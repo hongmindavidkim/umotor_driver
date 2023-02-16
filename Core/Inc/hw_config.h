@@ -45,13 +45,14 @@
 #define DTC_MAX 			0.94f          	// Max duty cycle
 #define DTC_MIN 			0.0f          	// Min duty cycle
 #define DTC_COMP 			0.000f          // deadtime compensation (100 ns / 25 us)
-#define DT					.000025f		// Loop period
-#define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
+#define DT					0.00005f //.000025f		// Loop period
+//#define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
 
-/* Encoder data filtering */
-#define V_U12_MIN 			-65.0f
-#define V_U12_MAX 			65.0f
-#define RATIO 				6.0f
+// using flash values from CAN limits and gear ratio
+///* Encoder data filtering */
+//#define V_U12_MIN 			-65.0f
+//#define V_U12_MAX 			65.0f
+//#define RATIO 				6.0f
 
 /* Current controller */
 //#define L_D .000003f				// D axis inductance
@@ -64,8 +65,8 @@
 #define KI_Q 0.045f                // PI zero, in radians per sample
 
 #define OVERMODULATION 1.15f        // 1.0 = no overmodulation
-#define CURRENT_FILT_ALPHA	.1f	// 1st order d/q current filter (not used in control)
-#define VBUS_FILT_ALPHA		.1f		// 1st order bus voltage filter
+#define CURRENT_FILT_ALPHA	.05f //.1f	// 1st order d/q current filter (not used in control)
+#define VBUS_FILT_ALPHA		.05f //.1f		// 1st order bus voltage filter
 
 #define D_INT_LIM V_BUS/(K_D*KI_D)  // Amps*samples
 #define Q_INT_LIM V_BUS/(K_Q*KI_Q)  // Amps*samples

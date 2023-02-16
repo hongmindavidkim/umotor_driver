@@ -33,7 +33,7 @@ Core/Src/drv8323.o: ../Core/Src/drv8323.c ../Core/Inc/drv8323.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h \
  ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h \
- ../Core/Inc/usart.h ../Core/Inc/hw_config.h
+ ../Core/Inc/fsm.h ../Core/Inc/usart.h ../Core/Inc/hw_config.h
 ../Core/Inc/drv8323.h:
 ../Core/Inc/spi.h:
 ../Core/Inc/main.h:
@@ -70,5 +70,6 @@ Core/Src/drv8323.o: ../Core/Src/drv8323.c ../Core/Inc/drv8323.h \
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim_ex.h:
 ../Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h:
+../Core/Inc/fsm.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/hw_config.h:

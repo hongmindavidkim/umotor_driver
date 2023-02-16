@@ -43,17 +43,23 @@
 			 }
 			 else{
 				 /* Exit calibration mode when done */
-				 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
-				 E_ZERO = comm_encoder_cal.ezero;
-				 printf("E_ZERO: %d  %f\r\n", E_ZERO, TWO_PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
-				 memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
-				 memcpy(&ENCODER_LUT, comm_encoder_cal.lut_arr, sizeof(comm_encoder_cal.lut_arr));
-				 //for(int i = 0; i<128; i++){printf("%d\r\n", ENCODER_LUT[i]);}
-				 if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
-				 preference_writer_flush(&prefs);
-				 preference_writer_close(&prefs);
-				 preference_writer_load(prefs);
-				 update_fsm(fsmstate, 27);
+				 if (comm_encoder_cal.valid_cal == 1){
+					 //for(int i = 0; i<128*PPAIRS; i++){printf("%d\r\n", error_array[i]);}
+					 E_ZERO = comm_encoder_cal.ezero;
+					 printf("E_ZERO: %d  %f\r\n", E_ZERO, TWO_PI_F*fmodf((comm_encoder.ppairs*(float)(-E_ZERO))/((float)ENC_CPR), 1.0f));
+					 memcpy(&comm_encoder.offset_lut, comm_encoder_cal.lut_arr, sizeof(comm_encoder.offset_lut));
+					 memcpy(&ENCODER_LUT, comm_encoder_cal.lut_arr, sizeof(comm_encoder_cal.lut_arr));
+					 //for(int i = 0; i<128; i++){printf("%d\r\n", ENCODER_LUT[i]);}
+					 if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+					 preference_writer_flush(&prefs);
+					 preference_writer_close(&prefs);
+					 preference_writer_load(prefs);
+				 }
+				 // TODO: set to not use linearization if calibration is not valid?
+
+				 // exit to menu state
+				 fsmstate->next_state = MENU_MODE;
+				 fsmstate->ready = 0;
 			 }
 
 			 break;
@@ -66,7 +72,7 @@
 			 /* Otherwise, commutate */
 			 else{
 				 torque_control(&controller);
-				 field_weaken(&controller);
+				 //field_weaken(&controller); // TODO: add field-weakening back at some point
 				 commutate(&controller, &comm_encoder);
 			 }
 			 controller.timeout ++;
@@ -86,6 +92,17 @@
 
 		 case INIT_TEMP_MODE:
 			 break;
+
+		 case FAULT_MODE:
+			 // depending on fault, display different LED blink patterns
+
+			 if((controller.loop_count%5000)==0){
+				 HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
+			 } else if ((controller.loop_count%5000)==2500){
+				 HAL_GPIO_WritePin(LED, GPIO_PIN_RESET);
+			 }
+
+			 break;
 	 }
 
  }
@@ -95,7 +112,7 @@
 	  * Do necessary setup   */
 
 		switch(fsmstate->state){
-				case MENU_MODE:
+			case MENU_MODE:
 				//printf("Entering Main Menu\r\n");
 				enter_menu_state();
 				break;
@@ -109,8 +126,7 @@
 				comm_encoder.filt_enable = 0;
 				break;
 			case MOTOR_MODE:
-
-				//printf("Entering Motor Mode\r\n");
+				printf("\n\r\n\r Entering Motor Mode\r\n");
 				HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
 				reset_foc(&controller);
 				drv_enable_gd(drv);
@@ -118,13 +134,19 @@
 			case CALIBRATION_MODE:
 				//printf("Entering Calibration Mode\r\n");
 				/* zero out all calibrations before starting */
-
 				comm_encoder_cal.done_cal = 0;
 				comm_encoder_cal.done_ordering = 0;
+				comm_encoder_cal.valid_cal = 0;
 				comm_encoder_cal.started = 0;
+				// reset electrical zero and encoder filter
 				comm_encoder.e_zero = 0;
+				comm_encoder.filt_enable = 0;
+				// clear lookup table
 				memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));
 				drv_enable_gd(drv);
+				break;
+			case FAULT_MODE:
+				printf("\n\r\n\r Entering Fault Mode\n\r");
 				break;
 
 		}
@@ -145,23 +167,28 @@
 				break;
 			case ENCODER_MODE:
 				//printf("Leaving Encoder Mode\r\n");
-				comm_encoder.filt_enable = 1;
+				if (EN_ENC_FILTER == 1){
+					comm_encoder.filt_enable = 1;
+				}
 				fsmstate->ready = 1;
 				break;
 			case MOTOR_MODE:
 				/* Don't stop commutating if there are high currents or FW happening */
 				//if( (fabs(controller.i_q_filt)<1.0f) && (fabs(controller.i_d_filt)<1.0f) ){
-					fsmstate->ready = 1;
-					drv_disable_gd(drv);
-					reset_foc(&controller);
-					//printf("Leaving Motor Mode\r\n");
-					HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
+				fsmstate->ready = 1;
+				drv_disable_gd(drv);
+				reset_foc(&controller);
+				printf("\n\r Leaving Motor Mode\r\n");
+				HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
 				//}
 				zero_commands(&controller);		// Set commands to zero
 				break;
 			case CALIBRATION_MODE:
 				//printf("Exiting Calibration Mode\r\n");
 				drv_disable_gd(drv);
+				if (EN_ENC_FILTER == 1){
+					comm_encoder.filt_enable = 1;
+				}
 				//free(error_array);
 				//free(lut_array);
 
@@ -178,14 +205,14 @@
 	if(fsm_input == MENU_CMD){	// escape to exit to rest mode
 		fsmstate->next_state = MENU_MODE;
 		fsmstate->ready = 0;
+		if (fsmstate->state == MENU_MODE){
+			enter_menu_state(); // re-print menu
+		}
 		return;
 	}
 	switch(fsmstate->state){
 		case MENU_MODE:
 			switch (fsm_input){
-				case MENU_CMD:
-					enter_menu_state(); // re-print menu
-					break;
 				case CAL_CMD:
 					fsmstate->next_state = CALIBRATION_MODE;
 					fsmstate->ready = 0;
@@ -211,7 +238,13 @@
 					preference_writer_flush(&prefs);
 					preference_writer_close(&prefs);
 					preference_writer_load(prefs);
-					printf("\n\r  Saved new zero position:  %d\n\r\n\r", M_ZERO);
+					printf("\n\r\n\r  Saved new zero position:  %d\n\r\n\r", M_ZERO);
+					enter_menu_state(); // re-print menu
+					break;
+				case RESET_CMD:
+					reset_flash_values();
+					printf("\n\r\n\r Flash values have been reset. Power cycle to be safe! \n\r\n\r");
+					enter_menu_state(); // re-print menu
 					break;
 				}
 			break;
@@ -250,6 +283,7 @@
 	    printf(" s - Setup\n\r");
 	    printf(" e - Display Encoder\n\r");
 	    printf(" z - Set Zero Position\n\r");
+	    printf(" p - !!! Reset Flash Memory Values !!!\n\r");
 	    printf(" esc - Exit to Menu\n\r");
 
 	    //gpio.led->write(0);
@@ -257,35 +291,46 @@
 
  void enter_setup_state(void){
 	    printf("\r\n Configuration Options \n\r");
-	    printf(" %-4s %-31s %-5s %-6s %-2s\r\n", "prefix", "parameter", "min", "max", "current value");
+	    printf(" %-4s %-29s %-5s %-6s %-2s\r\n", "prefix", "parameter", "min", "max", "current value");
+
 	    printf("\r\n Motor:\r\n");
+	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Encoder Mech Zero", "0", "524288", M_ZERO);
+		printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Encoder Elec Zero", "0", "524288", E_ZERO);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "g", "Gear Ratio", "0", "-", GR);
 	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "k", "Torque Constant (N-m/A)", "0", "-", KT);
-
+	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Motor Phase Resistance (ohms)", "-", "-", R_PHASE);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "j", "D-axis inductance (H)", "0", "0.1", L_D);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "e", "Q-axis inductance (H)", "0", "0.1", L_Q);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "n", "Number of Pole Pairs (NPP)", "0", "40", PPAIRS);
 
 	    printf("\r\n Control:\r\n");
-
-//	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "s", "Current Controller K_SCALE", "0", "0.1", K_SCALE);                                                 //ADDED --> FOR CURRENT CONTROL GAINS (KP)
-//		printf(" %-4s %-31s %-5s %-6s %f\n\r", "d", "Current Controller KI_D", "0", "1.0", KI_D);                                                       //ADDED --> FOR CURRENT CONTROL GAINS (KI D-Axis)
-//		printf(" %-4s %-31s %-5s %-6s %f\n\r", "q", "Current Controller KI_Q", "0", "1.0", KI_Q);                                                       //ADDED --> FOR CURRENT CONTROL GAINS (KI Q-Axis)
-
+	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "y", "Encoder Linearization Enable", "0", "1", EN_ENC_LINEARIZE);
+		printf(" %-4s %-31s %-5s %-6s %d\n\r", "z", "Encoder Filter Enable", "0", "1", EN_ENC_FILTER);
+		printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Phase Order", "0", "1", PHASE_ORDER);
+	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Current Controller K_SCALE", "-", "-", K_SCALE); // TODO: decide if these should be in flash or not
+		printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Current Controller KI_D", "-", "-", KI_D);
+		printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Current Controller KI_Q", "-", "-", KI_Q);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "b", "Current Bandwidth (Hz)", "100", "2000", I_BW);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "l", "Current Limit (A)", "0.0", "60.0", I_MAX);
-	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "p", "Max Position Setpoint (rad)", "-", "-", P_MAX);
-	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "v", "Max Velocity Setpoint (rad)/s", "-", "-", V_MAX);
-	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "x", "Max Position Gain (N-m/rad)", "0.0", "1000.0", KP_MAX);
-	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "d", "Max Velocity Gain (N-m/rad/s)", "0.0", "5.0", KD_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "f", "FW Current Limit (A)", "0.0", "33.0", I_FW_MAX);
-	    //printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "h", "Temp Cutoff (C) (0 = none)", "0", "150", TEMP_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "c", "Continuous Current (A)", "0.0", "40.0", I_MAX_CONT);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "a", "Calibration Current (A)", "0.0", "20.0", I_CAL);
+
+	    printf("\r\n Thermal:\r\n");
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "h", "Temp Cutoff (C) (0 = none)", "0.0", "150.0", TEMP_MAX);
+		printf(" %-4s %-31s %-5s %-6s %.2f\n\r", "-", "Thermal Resistance (K-W/J)", "-", "-", R_TH);
+		printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Observer M Matrix (K/J)", "-", "-", INV_M_TH);
+		printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "-", "Ambient Temp @ Calibration (C)", "-", "-", T_AMBIENT);
+
 	    printf("\r\n CAN:\r\n");
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "i", "CAN ID", "0", "127", CAN_ID);
 	    printf(" %-4s %-31s %-5s %-6s %-5i\n\r", "m", "CAN TX ID", "0", "127", CAN_MASTER);
 	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "t", "CAN Timeout (cycles)(0 = none)", "0", "100000", CAN_TIMEOUT);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "p", "Max Position Setpoint (rad)", "-", "-", P_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "v", "Max Velocity Setpoint (rad)/s", "-", "-", V_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "x", "Max Position Gain (N-m/rad)", "-", "-", KP_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "d", "Max Velocity Gain (N-m/rad/s)", "-", "-", KD_MAX);
+
 	    printf(" \n\r To change a value, type 'prefix''value''ENTER'\n\r e.g. 'b1000''ENTER'\r\n ");
 	    printf("VALUES NOT ACTIVE UNTIL POWER CYCLE! \n\r\n\r");
  }
@@ -294,7 +339,29 @@
 	 /* Collects user input from serial (maybe eventually CAN) and updates settings */
 
 	 switch (fsmstate->cmd_id){
-		 case 'b':
+//		 case 's':
+//			 K_SCALE = fmaxf(fminf(atof(fsmstate->cmd_buff), 0.1f), 0.0f);
+//			 printf("K_SCALE set to %f\r\n", K_SCALE);
+//			 break;
+//		 case 'd':
+//			 KI_D = fmaxf(fminf(atof(fsmstate->cmd_buff), 1.0f), 0.0f);
+//			 printf("KI_D set to %f\r\n", KI_D);
+//			 break;
+//		 case 'q':
+//			 KI_Q = fmaxf(fminf(atof(fsmstate->cmd_buff), 1.0f), 0.0f);
+//			 printf("KI_Q set to %f\r\n", KI_Q);
+//			 break;
+ 		 case 'y':
+ 			 EN_ENC_LINEARIZE = atoi(fsmstate->cmd_buff);
+ 			 if (EN_ENC_LINEARIZE!=0) { EN_ENC_LINEARIZE = 1; }
+ 			 printf("EN_ENC_LINEARIZE set to %d\r\n", EN_ENC_LINEARIZE);
+ 			 break;
+ 		 case 'z':
+ 			 EN_ENC_FILTER = atoi(fsmstate->cmd_buff);
+ 			 if (EN_ENC_FILTER!=0) { EN_ENC_FILTER = 1; }
+			 printf("EN_ENC_FILTER set to %d\r\n", EN_ENC_FILTER);
+			 break;
+	 	 case 'b':
 			 I_BW = fmaxf(fminf(atof(fsmstate->cmd_buff), 2000.0f), 100.0f);
 			 printf("I_BW set to %f\r\n", I_BW);
 			 break;
@@ -392,7 +459,52 @@
 	 memset(&fsmstate->cmd_buff, 0, sizeof(fsmstate->cmd_buff));
  }
 
- void enter_motor_mode(void){
+
+ void reset_flash_values(){
+
+	PHASE_ORDER = 0;
+	CAN_ID = 1;
+	CAN_MASTER = 0;
+	CAN_TIMEOUT = 1000;
+	EN_ENC_FILTER = 0;
+	EN_ENC_LINEARIZE = 0;
+	E_ZERO = 0;
+	M_ZERO = 0;
+
+	I_BW = 1000;
+	I_MAX=40;
+	I_MAX_CONT = 14.0f;
+	I_CAL = 5.0f;
+	I_FW_MAX=0;
+
+	PPAIRS = 21.0f;
+	GR = 6.0f;
+	KT = 1.0f;
+	L_D = 0.000003f;
+	L_Q = 0.000003f;
+	R_PHASE = 0.0f;
+	R_NOMINAL = 0.0f;
+
+	R_TH = 1.25f;
+	C_TH = 0.0f;
+	INV_M_TH = 0.02825f;
+	T_AMBIENT = 25.0f;
+	TEMP_MAX = 125.0f;
+
+	P_MIN = -12.5f;
+	P_MAX = 12.5f;
+	V_MIN = -65.0f;
+	V_MAX = 65.0f;
+	KP_MAX = 500.0f;
+	KD_MAX = 10.0f;
+
+	/* Write new settings to flash */
+	if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
+	preference_writer_flush(&prefs);
+	preference_writer_close(&prefs);
+	preference_writer_load(prefs);
 
  }
+
+
 

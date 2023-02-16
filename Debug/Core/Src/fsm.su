@@ -1,8 +1,8 @@
 ../Core/Src/fsm.c:21:7:run_fsm	32	static
-../Core/Src/fsm.c:93:7:fsm_enter_state	16	static
-../Core/Src/fsm.c:133:7:fsm_exit_state	16	static
-../Core/Src/fsm.c:174:7:update_fsm	32	static
-../Core/Src/fsm.c:242:7:enter_menu_state	8	static
-../Core/Src/fsm.c:258:7:enter_setup_state	24	static
-../Core/Src/fsm.c:293:7:process_user_input	24	static
-../Core/Src/fsm.c:395:7:enter_motor_mode	4	static
+../Core/Src/fsm.c:110:7:fsm_enter_state	16	static
+../Core/Src/fsm.c:155:7:fsm_exit_state	16	static
+../Core/Src/fsm.c:201:7:update_fsm	32	static
+../Core/Src/fsm.c:275:7:enter_menu_state	8	static
+../Core/Src/fsm.c:292:7:enter_setup_state	24	static
+../Core/Src/fsm.c:338:7:process_user_input	24	static
+../Core/Src/fsm.c:463:7:reset_flash_values	16	static

@@ -97,6 +97,8 @@ int *lut_array = NULL;
 
 uint8_t Serial2RxBuffer[1];
 
+int loop_time;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -150,59 +152,51 @@ int main(void)
   MX_ADC2_Init();
   MX_ADC3_Init();
   MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim2); // enable this to use delay_us() function
-
+  HAL_TIM_Base_Start(&htim3); // enable this to time functions in us
 
   /* Load settings from flash */
   preference_writer_init(&prefs, 6);
   preference_writer_load(prefs);
 
   /* Sanitize configs in case flash is empty*/
-  if(E_ZERO==-1){E_ZERO = 0;}
-  if(M_ZERO==-1){M_ZERO = 0;}
-  if(isnan(I_BW) || I_BW==-1){I_BW = 1000;}
-  if(isnan(I_MAX) || I_MAX ==-1){I_MAX=40;}
-  if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=0;}
+  if(PHASE_ORDER==-1){PHASE_ORDER = 0;};
   if(CAN_ID==-1){CAN_ID = 1;}
   if(CAN_MASTER==-1){CAN_MASTER = 0;}
   if(CAN_TIMEOUT==-1){CAN_TIMEOUT = 1000;}
-  if(isnan(R_NOMINAL) || R_NOMINAL==-1){R_NOMINAL = 0.0f;}
-  if(isnan(TEMP_MAX) || TEMP_MAX==-1){TEMP_MAX = 125.0f;}
+  if(EN_ENC_FILTER ==-1){EN_ENC_FILTER = 0;}
+  if(EN_ENC_LINEARIZE ==-1){EN_ENC_LINEARIZE = 0;}
+  if(E_ZERO==-1){E_ZERO = 0;}
+  if(M_ZERO==-1){M_ZERO = 0;}
+
+  if(isnan(I_BW) || I_BW==-1){I_BW = 1000;}
+  if(isnan(I_MAX) || I_MAX ==-1){I_MAX=40;}
   if(isnan(I_MAX_CONT) || I_MAX_CONT==-1){I_MAX_CONT = 14.0f;}
   if(isnan(I_CAL)||I_CAL==-1){I_CAL = 5.0f;}
+  if(isnan(I_FW_MAX) || I_FW_MAX ==-1){I_FW_MAX=0;}
+
   if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
+  if(isnan(GR) || GR==-1){GR = 6.0f;}
+  if(isnan(KT) || KT==-1){KT = 1.0f;}
   if(isnan(L_D) || L_D==-1){L_D = 0.000003f;}
   if(isnan(L_Q) || L_Q==-1){L_Q = 0.000003f;}
-  if(isnan(GR) || GR==-1){GR = 1.0f;}
-  if(isnan(KT) || KT==-1){KT = 1.0f;}
+  if(isnan(R_PHASE) || R_PHASE==-1){R_PHASE = 0.0f;}
+  if(isnan(R_NOMINAL) || R_NOMINAL==-1){R_NOMINAL = 0.0f;}
+
+  if(isnan(R_TH) || R_TH==-1){R_TH = 1.25f;}
+  if(isnan(C_TH) || C_TH==-1){C_TH = 0.0f;}
+  if(isnan(INV_M_TH) || INV_M_TH==-1){INV_M_TH = 0.02825f;}
+  if(isnan(T_AMBIENT) || T_AMBIENT==-1){T_AMBIENT = 25.0f;}
+  if(isnan(TEMP_MAX) || TEMP_MAX==-1){TEMP_MAX = 125.0f;}
+
+  if(isnan(P_MIN) || P_MIN==-1){P_MIN = -12.5f;}
+  if(isnan(P_MAX) || P_MAX==-1){P_MAX = 12.5f;}
+  if(isnan(V_MIN) || V_MIN==-1){V_MIN = -65.0f;}
+  if(isnan(V_MAX) || V_MAX==-1){V_MAX = 65.0f;}
   if(isnan(KP_MAX) || KP_MAX==-1){KP_MAX = 500.0f;}
-  if(isnan(KD_MAX) || KD_MAX==-1){KD_MAX = 5.0f;}
-  if(isnan(P_MAX)){P_MAX = 12.5f;}
-  if(isnan(P_MIN)){P_MIN = -12.5f;}
-  if(isnan(V_MAX)){V_MAX = 65.0f;}
-  if(isnan(V_MIN)){V_MIN = -65.0f;}
-  // TODO: add current controller gains, filter enable here?
-//  CURRENT CONTROLLER
-//  if(isnan(K_SCALE) || K_SCALE==-1){K_SCALE = 0.00013310f;}                                                                                           //CURRENT CONTROLLER K_SCALE
-//  if(isnan(KI_D) || KI_D==-1){KI_D = 0.0373f;}                                                                                                        //CURRENT CONTROLLER KI_D
-//  if(isnan(KI_Q) || KI_Q==-1){KI_Q = 0.0373f;}                                                                                                        //CURRENT CONTROLLER KI_Q
-//
-//  //DEFAULT MOTOR PARAMS ARE FOR THE U12 MODULE BELOW
-//  //MOTOR PARAMS
-//  if(isnan(R_PHASE) || R_PHASE==-1){R_PHASE = 0.158f;}
-//  if(isnan(L_D) || L_D==-1){L_D = 0.000084f;}
-//  if(isnan(L_Q) || L_Q==-1){L_Q = 0.000084f;}
-//  //if(isnan(NPP) || NPP==-1){NPP = 21;}
-//  //ACTUATOR PARAMS
-//  if(isnan(KT) || KT==-1){KT = 0.1916f;}
-//  if(isnan(GR) || GR==-1){GR = 6.0f;}
-//  if(isnan(KT_OUT) || KT_OUT==-1){KT_OUT = 1.15f;}
-//  if(isnan(WB) || WB==-1){WB = 0.00608f;}
-//  //THERMAL OBSERVER
-//  if(isnan(R_TH) || R_TH==-1){R_TH = 1.25f;}
-//  if(isnan(INV_M_TH) || INV_M_TH==-1){INV_M_TH = 0.02825f;}
-//  if(isnan(T_AMBIENT) || T_AMBIENT==-1){T_AMBIENT = 25.0f;}
+  if(isnan(KD_MAX) || KD_MAX==-1){KD_MAX = 10.0f;}
 
   printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
 
@@ -225,8 +219,7 @@ int main(void)
   comm_encoder.ppairs = PPAIRS;
   ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
 
-  if(EN_ENC_LINEARIZATION){memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));}	// Copy the linearization lookup table
-  else{memset(&comm_encoder.offset_lut, 0, sizeof(comm_encoder.offset_lut));}
+  memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));	// Copy the linearization lookup table
   //for(int i = 0; i<128; i++){printf("%d\r\n", comm_encoder.offset_lut[i]);}
 
   /* Turn on ADCs */
@@ -270,12 +263,12 @@ int main(void)
   //__HAL_CAN_ENABLE_IT(&CAN_H, CAN_IT_RX_FIFO0_MSG_PENDING); // Start can interrupt
 
   /* Set Interrupt Priorities */
-  HAL_NVIC_SetPriority(PWM_ISR, 0x0,0x0); // commutation > communication
-  HAL_NVIC_SetPriority(CAN_ISR, 0x01, 0x01);
+  HAL_NVIC_SetPriority(PWM_ISR, 0x01,0x01); // commutation > communication
+//  HAL_NVIC_SetPriority(CAN_ISR, 0x02, 0x02);
 
   /* Turn on interrupts */
   HAL_UART_Receive_IT(&huart2, (uint8_t *)Serial2RxBuffer, 1);
-  HAL_TIM_Base_Start_IT(&htim1);
+  HAL_TIM_Base_Start_IT(&htim1); // start main control interrupt
 
   // Check encoder initialization here
   int new_offset = 0;
@@ -287,14 +280,18 @@ int main(void)
   drv_disable_gd(drv);
   HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
 
-  E_ZERO = -1*new_offset; // TODO: need to convert float offset to int in counts?
+  E_ZERO = new_offset;
   comm_encoder.e_zero = E_ZERO;
   printf(" Position Sensor Electrical Offset: %d\n\r", E_ZERO);
 
   // initialize filter here for position sensor
   HAL_Delay(100);
   ps_filter_init(&comm_encoder);
-  comm_encoder.filt_enable = 1;
+  if (EN_ENC_FILTER == 1){
+	  comm_encoder.filt_enable = 1;
+  }
+  // reset encoder sample count
+  comm_encoder.first_sample = 0;
 
   /* Start the FSM */
   state.state = MENU_MODE;
@@ -310,7 +307,8 @@ int main(void)
   {
 
 	  HAL_Delay(100);
-	  drv_print_faults(drv);
+//	  printf("%d\n\r", loop_time);
+	  drv_check_faults(drv, &state);
 	 // if(state.state==MOTOR_MODE){
 
 

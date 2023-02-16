@@ -20,7 +20,7 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
 	PHASE_ORDER = 0;
 
 	if(!cal->started){
-		printf("Checking phase sign, pole pairs\r\n");
+		printf("\n\r\n\rChecking phase sign, pole pairs\r\n");
 		cal->started = 1;
 		cal->start_count = loop_count;
 	}
@@ -68,7 +68,7 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
 }
 
 void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, int loop_count){
-	/* Calibrates e-zero and encoder nonliearity */
+	/* Calibrates e-zero and encoder nonlinearity */
 
 	if(!cal->started){
 			printf("Starting offset cal and linearization\r\n");
@@ -100,10 +100,12 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 
 		// sample SAMPLES_PER_PPAIR times per pole-pair
 		if(cal->time > cal->next_sample_time){
+
 			int count_ref = cal->theta_ref * (float)ENC_CPR/(2.0f*PI_F*PPAIRS);
 			int error = encoder->raw - count_ref;//- encoder->raw;
 			cal->error_arr[cal->sample_count] = error + ENC_CPR*(error<0);
-			printf("%d %d %d %.3f\r\n", cal->sample_count, count_ref, cal->error_arr[cal->sample_count], cal->theta_ref);
+			printf("%.3f %d %d\r\n", cal->theta_ref, count_ref, cal->error_arr[cal->sample_count]);
+
 			cal->next_sample_time += 2.0f*PI_F/(W_CAL*SAMPLES_PER_PPAIR);
 			if(cal->sample_count == PPAIRS*SAMPLES_PER_PPAIR-1){
 				return;
@@ -123,12 +125,13 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 
 		// sample SAMPLES_PER_PPAIR times per pole-pair
 		if((cal->time > cal->next_sample_time)&&(cal->sample_count>0)){
+
 			int count_ref = cal->theta_ref * (float)ENC_CPR/(2.0f*PI_F*PPAIRS);
 			int error = encoder->raw - count_ref;// - encoder->raw;
 			error = error + ENC_CPR*(error<0);
-
 			cal->error_arr[cal->sample_count] = (cal->error_arr[cal->sample_count] + error)/2;
-			printf("%d %d %d %.3f\r\n", cal->sample_count, count_ref, cal->error_arr[cal->sample_count], cal->theta_ref);
+			printf("%.3f %d %d\r\n", cal->theta_ref, count_ref, cal->error_arr[cal->sample_count]);
+
 			cal->sample_count--;
 			cal->next_sample_time += 2.0f*PI_F/(W_CAL*SAMPLES_PER_PPAIR);
 		}
@@ -144,29 +147,40 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 	}
 	cal->ezero = ezero_mean/(SAMPLES_PER_PPAIR*PPAIRS);
 
-	// Moving average to filter out cogging ripple
+	// check for valid calibration...ezero mean is in counts, should be less than CPR
+	if (cal->ezero < ENC_CPR){
+		printf("Valid calibration. Mean elec zero: %d\n\r", cal->ezero);
+		cal->valid_cal = 1;
 
-	int window = SAMPLES_PER_PPAIR;
-	int lut_offset = (ENC_CPR-cal->error_arr[0])*N_LUT/ENC_CPR;
-	for(int i = 0; i<N_LUT; i++){
-			int moving_avg = 0;
-			for(int j = (-window)/2; j<(window)/2; j++){
-				int index = i*PPAIRS*SAMPLES_PER_PPAIR/N_LUT + j;
-				if(index<0){index += (SAMPLES_PER_PPAIR*PPAIRS);}
-				else if(index>(SAMPLES_PER_PPAIR*PPAIRS-1)){index -= (SAMPLES_PER_PPAIR*PPAIRS);}
-				moving_avg += cal->error_arr[index];
+		// Moving average to filter out cogging ripple
+		int window = SAMPLES_PER_PPAIR;
+		int lut_offset = (ENC_CPR-cal->error_arr[0])*N_LUT/ENC_CPR;
+		for(int i = 0; i<N_LUT; i++){
+				int moving_avg = 0;
+				for(int j = (-window)/2; j<(window)/2; j++){
+					int index = i*PPAIRS*SAMPLES_PER_PPAIR/N_LUT + j;
+					if(index<0){index += (SAMPLES_PER_PPAIR*PPAIRS);}
+					else if(index>(SAMPLES_PER_PPAIR*PPAIRS-1)){index -= (SAMPLES_PER_PPAIR*PPAIRS);}
+					moving_avg += cal->error_arr[index];
+				}
+				moving_avg = moving_avg/window;
+				int lut_index = lut_offset + i;
+				if(lut_index>(N_LUT-1)){lut_index -= N_LUT;}
+				cal->lut_arr[lut_index] = moving_avg - cal->ezero;
+				printf("%d  %d\r\n", lut_index, moving_avg - cal->ezero);
 			}
-			moving_avg = moving_avg/window;
-			int lut_index = lut_offset + i;
-			if(lut_index>(N_LUT-1)){lut_index -= N_LUT;}
-			cal->lut_arr[lut_index] = moving_avg - cal->ezero;
-			printf("%d  %d\r\n", lut_index, moving_avg - cal->ezero);
 
-		}
+	} else {
+		printf("Bad calibration, won't save the data. Mean elec zero: %d\n\r", cal->ezero);
+		cal->valid_cal = 0;
+
+	}
 
 	cal->started = 0;
 	cal->done_cal = 1;
+
 }
+
 
 void measure_lr(EncoderStruct *encoder, ControllerStruct *controller, CalStruct * cal, int loop_count){
 	// TODO: implement this?
@@ -178,7 +192,6 @@ int check_encoder_init(EncoderStruct *encoder, ControllerStruct *controller, Cal
 	printf("\n\r Checking encoder initialization\n\r");
 
 	float theta_elec_read = 0.0f;
-	float theta_elec_calc = 0.0f;
 	float theta_elec_err = 0.0f;
 	int theta_elec_counts = 0;
 
@@ -204,18 +217,23 @@ int check_encoder_init(EncoderStruct *encoder, ControllerStruct *controller, Cal
 		}
 	}
 
-	// Print difference and status of initialization
-	if (theta_elec_read > PI_F) { theta_elec_calc = theta_elec_read - 2.0f*PI_F; } // wrap from -PI to PI instead of 0 to 2*PI
-	else { theta_elec_calc = theta_elec_read; };
-	if (theta_elec_calc >= 0.0f) { theta_elec_err = theta_elec_calc; }
-	else { theta_elec_err = -theta_elec_calc; }
-//    theta_elec_err = abs(theta_elec_calc);
+	// how far from elec angle of 0?
+	if (theta_elec_read > PI_F) { theta_elec_err = theta_elec_read - 2.0f*PI_F; } // wrap from -PI to PI instead of 0 to 2*PI
+	else { theta_elec_err = theta_elec_read; };
 
-	if (theta_elec_err < (PI_F/2.0f)) { // initialization is good
-		printf(" Good initialization! theta_elec = %.2f, theta_elec_calc = %.2f\r\n", theta_elec_read, theta_elec_calc);
+	float diff_zeros = ((float)(theta_elec_counts-E_ZERO))*PPAIRS/((float)ENC_CPR);
+	int diff_int = diff_zeros;
+	diff_zeros = diff_zeros - (float)diff_int;
+	diff_zeros = diff_zeros>0.5 ? diff_zeros-1.0 : diff_zeros<-0.5 ? diff_zeros+1.0 : diff_zeros;
+
+	// Print difference and status of initialization
+	if ((theta_elec_err < (PI_F/2.0f)) && (theta_elec_err > (-PI_F/2.0f)) ) { // initialization is good
+		printf(" Good initialization! \n\r");
+		printf(" Angle Error = %.2f, Old Zero = %d, New Zero = %d, Zero Diff (Elec Rots) = %.2f\r\n", theta_elec_err, E_ZERO, theta_elec_counts, diff_zeros);
 		encoder->init_status = 1;
 	} else { // electrical angle error is larger than 90deg
-		printf(" BAD initialization, theta_elec = %.2f, theta_elec_calc = %.2f\r\n", theta_elec_read, theta_elec_calc);
+		printf(" BAD initialization! \n\r");
+		printf(" Angle Error = %.2f, Old Zero = %d, New Zero = %d, Zero Diff (Elec Rots) = %.2f\r\n", theta_elec_err, E_ZERO, theta_elec_counts, diff_zeros);
 		encoder->init_status = 0;
 	}
 

@@ -12,6 +12,7 @@
 
 #include "spi.h"
 #include <stdint.h>
+#include "fsm.h"
 
 /// Registers ///
 #define FSR1            0x0     /// Fault Status Register 1
@@ -187,7 +188,7 @@ void drv_write_CSACR(DRVStruct drv, int CSA_FET, int VREF_DIV, int LS_REF, int C
 void drv_enable_gd(DRVStruct drv);
 void drv_disable_gd(DRVStruct drv);
 void drv_calibrate(DRVStruct drv);
-void drv_print_faults(DRVStruct drv);
+void drv_check_faults(DRVStruct drv, FSMStruct* fsmstate);
 
 
 

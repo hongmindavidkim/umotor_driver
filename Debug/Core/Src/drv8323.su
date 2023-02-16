@@ -11,4 +11,4 @@
 ../Core/Src/drv8323.c:56:6:drv_enable_gd	24	static
 ../Core/Src/drv8323.c:60:6:drv_disable_gd	24	static
 ../Core/Src/drv8323.c:64:6:drv_calibrate	24	static
-../Core/Src/drv8323.c:68:6:drv_print_faults	24	static
+../Core/Src/drv8323.c:68:6:drv_check_faults	32	static

@@ -65,7 +65,7 @@ void drv_calibrate(DRVStruct drv){
 	uint16_t val = (0x1<<4) + (0x1<<3) + (0x1<<2);
 	drv_write_register(drv, CSACR, val);
 }
-void drv_print_faults(DRVStruct drv){
+void drv_check_faults(DRVStruct drv, FSMStruct* fsmstate){
     uint16_t val1 = drv_read_FSR1(drv);
     uint16_t val2 = drv_read_FSR2(drv);
 
@@ -93,5 +93,10 @@ void drv_print_faults(DRVStruct drv){
     if(val2 & (1<<2)){printf("VGS_LB\n\r");}
     if(val2 & (1<<1)){printf("VGS_HC\n\r");}
     if(val2 & (1)){printf("VGS_LC\n\r");}
+
+    // TODO: store fault values for using in fault mode?
+    if(val1 & (1<<10)){
+    	fsmstate->next_state = FAULT_MODE;
+    }
 
 }

@@ -29,7 +29,7 @@ typedef struct{
 	float theta_start;								// cal start angle
 	int ezero;
 	uint8_t phase_order;							// phase order correct (0) or swapped (1)
-	uint8_t done_ordering, done_cal, done_rl;		// flags for different cals finished
+	uint8_t done_ordering, done_cal, valid_cal, done_rl;		// flags for different cals finished
 	uint16_t sample_count;							// keep track of how many samples taken
 	float next_sample_time;							// time to take next sample
 	int error_arr[N_CAL];

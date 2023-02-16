@@ -22,6 +22,8 @@ extern "C" {
 #define SETUP_MODE          4
 #define ENCODER_MODE        5
 #define INIT_TEMP_MODE      6
+#define FAULT_MODE			7 // TODO: implement this with some fast LED flashing to indicate without UART, could be due to bad init or drv
+
 
 #define MENU_CMD			27
 #define MOTOR_CMD			'm'
@@ -30,7 +32,7 @@ extern "C" {
 #define SETUP_CMD			's'
 #define ZERO_CMD			'z'
 #define ENTER_CMD			13
-
+#define RESET_CMD			'p'
 
 
 typedef struct{
@@ -50,8 +52,10 @@ void fsm_enter_state(FSMStruct * fsmstate);
 void fsm_exit_state(FSMStruct * fsmstate);
 void enter_menu_state(void);
 void enter_setup_state(void);
-void enter_motor_mode(void);
+//void enter_motor_mode(void);
 void process_user_input(FSMStruct * fsmstate);
+void reset_flash_values();
+
 
 #ifdef __cplusplus
 }
