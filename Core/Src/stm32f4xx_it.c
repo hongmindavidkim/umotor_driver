@@ -270,7 +270,8 @@ void can_tx_rx(void){
 
 	int no_mesage = HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
 	if(!no_mesage){
-//		printf("RX!\n\r");
+//		printf("RX: %X, %X, %X, %X, %X, %X, %X, %X\n\r", can_rx.data[0], can_rx.data[1], can_rx.data[2], can_rx.data[3], can_rx.data[4], can_rx.data[5], can_rx.data[6], can_rx.data[7]);
+//		HAL_GPIO_TogglePin(LED); //Toggle the state of led on can rx
 		uint32_t TxMailbox;
 		pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT*GR);	// Pack response
 		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
