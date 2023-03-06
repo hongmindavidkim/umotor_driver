@@ -201,6 +201,8 @@ int main(void)
   if(isnan(V_MAX) || V_MAX==-1){V_MAX = 65.0f;}
   if(isnan(KP_MAX) || KP_MAX==-1){KP_MAX = 500.0f;}
   if(isnan(KD_MAX) || KD_MAX==-1){KD_MAX = 10.0f;}
+  if(isnan(T_MIN) || T_MIN==-1){T_MIN = -72.0f;}
+  if(isnan(T_MAX) || T_MAX==-1){T_MAX = 72.0f;}
 
   printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
 

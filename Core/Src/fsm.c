@@ -330,6 +330,7 @@
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "v", "Max Velocity Setpoint (rad)/s", "-", "-", V_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "x", "Max Position Gain (N-m/rad)", "-", "-", KP_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "d", "Max Velocity Gain (N-m/rad/s)", "-", "-", KD_MAX);
+	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "q", "Max Torque Setpoint (Nm)", "-", "-", T_MAX);
 
 	    printf(" \n\r To change a value, type 'prefix''value''ENTER'\n\r e.g. 'b1000''ENTER'\r\n ");
 	    printf("VALUES NOT ACTIVE UNTIL POWER CYCLE! \n\r\n\r");
@@ -443,6 +444,11 @@
 			 V_MIN = -V_MAX;
 			 printf("V_MAX set to %f\r\n", V_MAX);
 			 break;
+		 case 'q':
+			 T_MAX = fmaxf(atof(fsmstate->cmd_buff), 0.0f);
+			 T_MIN = -T_MAX;
+			 printf("T_MAX set to %f\r\n", T_MAX);
+			 break;
 		 default:
 			 printf("\n\r '%c' Not a valid command prefix\n\r\n\r", (char)fsmstate->cmd_buff[0]);
 			 break;
@@ -505,6 +511,8 @@
 	V_MAX = 65.0f;
 	KP_MAX = 500.0f;
 	KD_MAX = 10.0f;
+	T_MIN = -72.0f;
+	T_MAX = 72.0f;
 
 	/* Write new settings to flash */
 	if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}

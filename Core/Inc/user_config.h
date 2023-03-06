@@ -35,11 +35,13 @@ extern "C" {
 #define TEMP_MAX                __float_reg[23]                                  // Temperature safety limit
 
 #define P_MIN					__float_reg[24]									// Position setpoint lower limit (rad)
-#define P_MAX					__float_reg[25]									// Position setupoint upper bound (rad)
+#define P_MAX					__float_reg[25]									// Position setpoint upper bound (rad)
 #define V_MIN					__float_reg[26]									// Velocity setpoint lower bound (rad/s)
 #define V_MAX					__float_reg[27]									// Velocity setpoint upper bound (rad/s)
 #define KP_MAX					__float_reg[28]									// Max position gain (N-m/rad)
 #define KD_MAX					__float_reg[29]									// Max velocity gain (N-m/rad/s)
+#define T_MIN					__float_reg[30]									// Torque setpoint lower limit (Nm)
+#define T_MAX					__float_reg[31]									// Torque setpoint upper limit (Nm)
 
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration
 #define CAN_ID                  __int_reg[1]                                    // CAN bus ID
