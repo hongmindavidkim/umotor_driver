@@ -7,7 +7,7 @@
 extern "C" {
 #endif
 
-
+// length of float reg is 64
 #define I_BW                    __float_reg[2]                                  // Current loop bandwidth
 #define I_MAX                   __float_reg[3]                                  // Current limit
 #define I_MAX_CONT              __float_reg[4]                                  // Continuous max current
@@ -43,6 +43,7 @@ extern "C" {
 #define T_MIN					__float_reg[30]									// Torque setpoint lower limit (Nm)
 #define T_MAX					__float_reg[31]									// Torque setpoint upper limit (Nm)
 
+// length of int reg is 256
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration
 #define CAN_ID                  __int_reg[1]                                    // CAN bus ID
 #define CAN_MASTER              __int_reg[2]                                    // CAN bus "master" ID
