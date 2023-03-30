@@ -95,8 +95,8 @@ void drv_check_faults(DRVStruct drv, FSMStruct* fsmstate){
     if(val2 & (1)){printf("VGS_LC\n\r");} // gate drive fault, C low-side
 
     // TODO: store fault values for using in fault mode?
-    if(val1 & (1<<10)){ // fault bit is set
-    	fsmstate->next_state = FAULT_MODE;
-    }
+//    if(val1 & (1<<10)){ // fault bit is set
+//    	fsmstate->next_state = FAULT_MODE;
+//    }
 
 }
