@@ -72,6 +72,7 @@ void calibrate_encoder(EncoderStruct *encoder, ControllerStruct *controller, Cal
 
 	if(!cal->started){
 			printf("Starting offset cal and linearization\r\n");
+			printf("Theta ref, count ref, count error\r\n");
 			cal->started = 1;
 			cal->start_count = loop_count;
 			cal->next_sample_time = T1;

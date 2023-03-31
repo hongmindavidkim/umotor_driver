@@ -237,24 +237,19 @@ int main(void)
   HAL_GPIO_WritePin(DRV_CS, GPIO_PIN_SET ); 	// CS high
   HAL_GPIO_WritePin(ENABLE_PIN, GPIO_PIN_SET );
   HAL_Delay(1);
-  //drv_calibrate(drv);
+  drv_write_DCR(drv, 0x0, DIS_GDF_DIS, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1); //  TODO: enable gate drive fault?
   HAL_Delay(1);
-  drv_write_DCR(drv, 0x0, DIS_GDF_EN, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1);
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, DIS_SEN_EN, 0x1, 0x1, 0x1, SEN_LVL_1_0); // calibrate shunt amplifiers
   HAL_Delay(1);
-  int CSA_GAIN;
-  if(I_MAX <= 40.0f){CSA_GAIN = CSA_GAIN_40;}	// Up to 40A use 40X amplifier gain
-  else{CSA_GAIN = CSA_GAIN_20;}					// From 40-60A use 20X amplifier gain.  (Make this generic in the future)
-  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, 0x0, 0x1, 0x1, 0x1, SEN_LVL_0_25);
+  zero_current(&controller); // moved this between the two drv_write_CSACR calls to match mbed fw version
   HAL_Delay(1);
-  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN, 0x1, 0x0, 0x0, 0x0, SEN_LVL_0_25);
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, DIS_SEN_DIS, 0x0, 0x0, 0x0, SEN_LVL_1_0); // TODO: enable sensing of overcurrent fault?
   HAL_Delay(1);
-  zero_current(&controller);
-  HAL_Delay(1);
-  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_RETRY, OCP_DEG_4US, VDS_LVL_0_45);
+  drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_NONE, OCP_DEG_8US, VDS_LVL_1_88); // TODO: reduce VDS level and add OCP_RETRY?
   HAL_Delay(1);
   drv_disable_gd(drv);
   HAL_Delay(1);
-  //drv_enable_gd(drv);   */
+  //drv_enable_gd(drv);
   printf("ADC A OFFSET: %d     ADC B OFFSET: %d\r\n", controller.adc_a_offset, controller.adc_b_offset);
 
   /* Turn on PWM */

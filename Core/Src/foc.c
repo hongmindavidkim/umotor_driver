@@ -41,6 +41,11 @@ void set_dtc(ControllerStruct *controller){
 
 void analog_sample (ControllerStruct *controller){
 	/* Sampe ADCs */
+
+	// moved to start to get new values from ADC
+	HAL_ADC_Start(&ADC_CH_MAIN);
+	HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
+
 	/* Handle phase order swapping so that voltage/current/torque match encoder direction */
 	if(!PHASE_ORDER){
 		controller->adc_a_raw = HAL_ADC_GetValue(&ADC_CH_IA);
@@ -53,9 +58,8 @@ void analog_sample (ControllerStruct *controller){
 		//adc_ch_ic = ADC_CH_IB;
 	}
 
-
-	HAL_ADC_Start(&ADC_CH_MAIN);
-	HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
+//	HAL_ADC_Start(&ADC_CH_MAIN);
+//	HAL_ADC_PollForConversion(&ADC_CH_MAIN, HAL_MAX_DELAY);
 
 	controller->adc_vbus_raw = HAL_ADC_GetValue(&ADC_CH_VBUS);
 	controller->v_bus = (float)controller->adc_vbus_raw*V_SCALE;
@@ -260,6 +264,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
        controller->i_d_filt = (1.0f-CURRENT_FILT_ALPHA)*controller->i_d_filt + CURRENT_FILT_ALPHA*controller->i_d;
        controller->v_bus_filt = (1.0f-VBUS_FILT_ALPHA)*controller->v_bus_filt + VBUS_FILT_ALPHA*controller->v_bus;	// used for voltage saturation
 
+       // TODO: remove or hard-code v_max for now?
        controller->v_max = OVERMODULATION*controller->v_bus_filt*(DTC_MAX-DTC_MIN)*SQRT1_3;
        controller->i_max = I_MAX; //I_MAX*(!controller->otw_flag) + I_MAX_CONT*controller->otw_flag;
 

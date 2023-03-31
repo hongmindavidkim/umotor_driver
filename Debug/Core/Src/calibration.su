@@ -1,4 +1,4 @@
 ../Core/Src/calibration.c:17:6:order_phases	48	static
 ../Core/Src/calibration.c:70:6:calibrate_encoder	88	static
-../Core/Src/calibration.c:185:6:measure_lr	24	static
-../Core/Src/calibration.c:190:5:check_encoder_init	88	static
+../Core/Src/calibration.c:186:6:measure_lr	24	static
+../Core/Src/calibration.c:191:5:check_encoder_init	88	static
