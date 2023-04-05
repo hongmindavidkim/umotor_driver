@@ -183,7 +183,7 @@ int main(void)
 
   if(isnan(PPAIRS) || PPAIRS==-1){PPAIRS = 21.0f;}
   if(isnan(GR) || GR==-1){GR = 6.0f;}
-  if(isnan(KT) || KT==-1){KT = 1.0f;}
+  if(isnan(KT_OUT) || KT_OUT==-1){KT_OUT = 1.0f;}
   if(isnan(L_D) || L_D==-1){L_D = 0.000003f;}
   if(isnan(L_Q) || L_Q==-1){L_Q = 0.000003f;}
   if(isnan(R_PHASE) || R_PHASE==-1){R_PHASE = 0.433f;}

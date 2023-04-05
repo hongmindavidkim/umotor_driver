@@ -306,7 +306,7 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 void torque_control(ControllerStruct *controller){
 
     float torque_des = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
-    controller->i_q_des = fast_fmaxf(fast_fminf(torque_des/(KT*GR), controller->i_max), -controller->i_max);
+    controller->i_q_des = fast_fmaxf(fast_fminf(torque_des/(KT_OUT), controller->i_max), -controller->i_max);
     controller->i_d_des = 0.0f;
 
     }

@@ -83,7 +83,8 @@
 
 		 case ENCODER_MODE:
 			 if (fsmstate->print_iter == 800){
-				 ps_print(&comm_encoder);
+				 //ps_print(&comm_encoder);
+				 printf("Current A: %f, Current B: %f, Bus voltage: %f\n\r", controller.i_a, controller.i_b, controller.v_bus);
 				 fsmstate->print_iter = 0;
 			 } else {
 				 fsmstate->print_iter +=1;
@@ -297,7 +298,7 @@
 	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Encoder Mech Zero", "0", "524288", M_ZERO);
 		printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Encoder Elec Zero", "0", "524288", E_ZERO);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "g", "Gear Ratio", "0", "-", GR);
-	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "k", "Torque Constant (N-m/A)", "0", "-", KT);
+	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "k", "Output Torque Constant (N-m/A)", "0", "-", KT_OUT);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "o", "Motor Phase Resistance (ohms)", "0.0", "10.0", R_PHASE);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "j", "D-axis inductance (H)", "0", "0.1", L_D);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "e", "Q-axis inductance (H)", "0", "0.1", L_Q);
@@ -407,8 +408,8 @@
 			 printf("GR set to %f\r\n", GR);
 			 break;
 		 case 'k':
-			 KT = fmaxf(atof(fsmstate->cmd_buff), 0.0001f);	// Limit prevents divide by zero.  Seems like a reasonable LB?
-			 printf("KT set to %f\r\n", KT);
+			 KT_OUT = fmaxf(atof(fsmstate->cmd_buff), 0.0001f);	// Limit prevents divide by zero.  Seems like a reasonable LB?
+			 printf("KT set to %f\r\n", KT_OUT);
 			 break;
 
 		 case 'j':
@@ -493,7 +494,7 @@
 
 	PPAIRS = 21.0f;
 	GR = 6.0f;
-	KT = 1.0f;
+	KT_OUT = 1.0f;
 	L_D = 0.000003f;
 	L_Q = 0.000003f;
 	R_PHASE = 0.433f;

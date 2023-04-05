@@ -22,7 +22,7 @@ extern "C" {
 
 #define PPAIRS					__float_reg[12]									// Number of motor pole-pairs
 #define GR						__float_reg[13]									// Gear ratio
-#define KT						__float_reg[14]									// Torque Constant (N-m/A)
+#define KT_OUT						__float_reg[14]									// Torque Constant (N-m/A)
 #define L_D						__float_reg[15]									// D-axis inductance
 #define L_Q						__float_reg[16]									// Q-axis inductance
 #define R_PHASE					__float_reg[17]									// Single phase resistance
