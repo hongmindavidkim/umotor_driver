@@ -83,8 +83,8 @@
 
 		 case ENCODER_MODE:
 			 if (fsmstate->print_iter == 800){
-				 //ps_print(&comm_encoder);
-				 printf("Current A: %f, Current B: %f, Bus voltage: %f\n\r", controller.i_a, controller.i_b, controller.v_bus);
+				 ps_print(&comm_encoder);
+//				 printf("Current A: %f, Current B: %f, Bus voltage: %f\n\r", controller.i_a, controller.i_b, controller.v_bus);
 				 fsmstate->print_iter = 0;
 			 } else {
 				 fsmstate->print_iter +=1;
