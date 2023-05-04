@@ -69,12 +69,11 @@
 			 if((CAN_TIMEOUT > 0 ) && (controller.timeout > CAN_TIMEOUT)){
 				 zero_commands(&controller);
 			 }
-			 /* Otherwise, commutate */
-			 else{
-				 torque_control(&controller);
-				 //field_weaken(&controller); // TODO: add field-weakening back at some point
-				 commutate(&controller, &comm_encoder);
-			 }
+
+			 /* commutate */
+			 torque_control(&controller);
+			 //field_weaken(&controller); // TODO: add field-weakening back at some point
+			 commutate(&controller, &comm_encoder);
 			 controller.timeout ++;
 			 break;
 
