@@ -49,7 +49,7 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
 	reset_foc(controller);
 
 	float theta_end = encoder->angle_multiturn[0];
-	cal->ppairs = round(2.0f*PI_F/fabsf(theta_end-cal->theta_start));
+	// cal->ppairs = round(2.0f*PI_F/fabsf(theta_end-cal->theta_start));
 
 	if(cal->theta_start < theta_end){
 		cal->phase_order = 0;
