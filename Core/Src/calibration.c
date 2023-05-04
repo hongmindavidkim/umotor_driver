@@ -62,7 +62,7 @@ void order_phases(EncoderStruct *encoder, ControllerStruct *controller, CalStruc
     printf("Pole Pairs: %d\r\n", cal->ppairs);
     printf("Start: %.3f   End: %.3f\r\n", cal->theta_start, theta_end);
     PHASE_ORDER = cal->phase_order;
-    PPAIRS = (float)cal->ppairs;
+//    PPAIRS = (float)cal->ppairs;
     cal->started = 0;
     cal->done_ordering = 1;	// Finished checking phase order
 }
