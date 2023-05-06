@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 2.2f // incremented to 2.2 by Andrew 1/20/23
+#define VERSION_NUM 3.0f // incremented to 3.0 by Elijah for humanoid transfer 5/6/23
 
 
 /* USER CODE END PM */
