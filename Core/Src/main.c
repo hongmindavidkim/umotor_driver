@@ -91,6 +91,9 @@ CalStruct comm_encoder_cal;
 CANTxMessage can_tx;
 CANRxMessage can_rx;
 
+//CAN ACTIAVTION FLAG
+int CAN_ACTIVE = 0;
+
 /* init but don't allocate calibration arrays */
 int *error_array = NULL;
 int *lut_array = NULL;

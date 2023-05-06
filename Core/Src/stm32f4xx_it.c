@@ -72,6 +72,8 @@ extern TIM_HandleTypeDef htim1;
 extern UART_HandleTypeDef huart2;
 /* USER CODE BEGIN EV */
 extern int loop_time;
+//CAN ACTIVE FLAG
+extern int CAN_ACTIVE;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -270,6 +272,8 @@ void can_tx_rx(void){
 
 	int no_mesage = HAL_CAN_GetRxMessage(&CAN_H, CAN_RX_FIFO0, &can_rx.rx_header, can_rx.data);	// Read CAN
 	if(!no_mesage){
+		//CAN RECIEVE FLAG SET
+		CAN_ACTIVE = 1;
 //		printf("RX: %X, %X, %X, %X, %X, %X, %X, %X\n\r", can_rx.data[0], can_rx.data[1], can_rx.data[2], can_rx.data[3], can_rx.data[4], can_rx.data[5], can_rx.data[6], can_rx.data[7]);
 //		HAL_GPIO_TogglePin(LED); //Toggle the state of led on can rx
 		uint32_t TxMailbox;

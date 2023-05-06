@@ -18,6 +18,9 @@
 #include "position_sensor.h"
 #include "drv8323.h"
 
+//CAN ACTIVE FLAG
+extern int CAN_ACTIVE;
+
  void run_fsm(FSMStruct * fsmstate){
 	 /* run_fsm is run every commutation interrupt cycle */
 
@@ -66,8 +69,12 @@
 
 		 case MOTOR_MODE:
 			 /* If CAN has timed out, reset all commands */
-			 if((CAN_TIMEOUT > 0 ) && (controller.timeout > CAN_TIMEOUT)){
+			 if((CAN_TIMEOUT > 0 ) && (controller.timeout > CAN_TIMEOUT) && (CAN_ACTIVE==1)){ // ONLY DO THIS IF CAN HAS BEEN RECIEVED
 				 zero_commands(&controller);
+				 //drop into MENU MODE
+				 fsmstate->next_state = MENU_MODE;
+				 fsmstate->ready = 0;
+				 CAN_ACTIVE = 0;
 			 }
 
 			 /* commutate */
