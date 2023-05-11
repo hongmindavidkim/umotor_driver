@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 3.04f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
+#define VERSION_NUM 3.05f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
 
 
 /* USER CODE END PM */
@@ -223,7 +223,6 @@ int main(void)
   memset(&comm_encoder_cal.cal_position, 0, sizeof(EncoderStruct));
 
   /* commutation encoder setup */
-  HAL_Delay(100);
   comm_encoder.m_zero = M_ZERO;
   comm_encoder.e_zero = E_ZERO;
   comm_encoder.ppairs = PPAIRS;
