@@ -290,7 +290,20 @@ int main(void)
 
   // initialize filter here for position sensor
   HAL_Delay(100);
-  ps_filter_init(&comm_encoder);
+//  ps_filter_init(&comm_encoder);
+
+  // average 100 samples for filter init values
+  int num_filt_init = 100;
+  float filt_prev_mech_temp = 0.0f;
+  float filt_prev_elec_temp = 0.0f;
+  for (int i=0; i<num_filt_init; i++){
+	  filt_prev_mech_temp += (1.0/(float)num_filt_init)*comm_encoder.angle_multiturn[0];
+	  filt_prev_elec_temp += (1.0/(float)num_filt_init)*comm_encoder.elec_angle;
+	  HAL_Delay(1); // need to wait for some time to get a new position sample
+  }
+  comm_encoder.filt_prev_mech = filt_prev_mech_temp;
+  comm_encoder.filt_prev_elec = filt_prev_elec_temp;
+
   if (EN_ENC_FILTER == 1){
 	  comm_encoder.filt_enable = 1;
   }

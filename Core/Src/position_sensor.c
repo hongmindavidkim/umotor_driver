@@ -139,7 +139,7 @@ void ps_print(EncoderStruct * encoder){
 	delay_us(10000);
 }
 
-void pc_zero(EncoderStruct * encoder){
+void ps_zero(EncoderStruct * encoder){
 	encoder->turns = 0;
 	encoder->m_zero = 0;
 	ps_sample(encoder, DT); //.00025f);
