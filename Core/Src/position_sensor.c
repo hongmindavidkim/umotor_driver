@@ -21,6 +21,7 @@ void ps_warmup(EncoderStruct * encoder, int n){
 		encoder->spi_tx_buff[2] = 0x00;
 		encoder->spi_tx_buff[3] = 0x00;
 		HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+		delay_us(1);
 		HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 4, 100);
 		while( ENC_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
 		HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
@@ -47,6 +48,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->spi_tx_buff[2] = 0x00;
 	encoder->spi_tx_buff[3] = 0x00;
 	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	delay_us(1);
 	HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 4, 100);
 	while( ENC_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
 	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
