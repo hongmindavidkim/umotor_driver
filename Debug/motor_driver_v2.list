@@ -9056,8 +9056,8 @@ int main(void)
  8005166:	f001 ff25 	bl	8006fb4 <HAL_Delay>
  800516a:	e033      	b.n	80051d4 <main+0x654>
  800516c:	f3af 8000 	nop.w
- 8005170:	e0000000 	.word	0xe0000000
- 8005174:	4008147a 	.word	0x4008147a
+ 8005170:	c0000000 	.word	0xc0000000
+ 8005174:	400828f5 	.word	0x400828f5
  8005178:	2000033c 	.word	0x2000033c
  800517c:	3fa00000 	.word	0x3fa00000
  8005180:	3ce76c8b 	.word	0x3ce76c8b
@@ -9381,6 +9381,7 @@ int main(void)
  8005424:	4a1c      	ldr	r2, [pc, #112]	; (8005498 <main+0x918>)
  8005426:	693b      	ldr	r3, [r7, #16]
  8005428:	f8c2 3080 	str.w	r3, [r2, #128]	; 0x80
+
   if (EN_ENC_FILTER == 1){
  800542c:	4b1d      	ldr	r3, [pc, #116]	; (80054a4 <main+0x924>)
  800542e:	691b      	ldr	r3, [r3, #16]
