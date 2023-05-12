@@ -1,6 +1,6 @@
-../Core/Src/position_sensor.c:15:6:ps_warmup	32	static
-../Core/Src/position_sensor.c:34:6:ps_sample	56	static
-../Core/Src/position_sensor.c:126:6:ps_print	16	static
-../Core/Src/position_sensor.c:142:6:ps_zero	16	static
-../Core/Src/position_sensor.c:149:6:WriteLUT	16	static
-../Core/Src/position_sensor.c:153:6:ps_filter_init	16	static
+../Core/Src/position_sensor.c:16:6:ps_warmup	32	static
+../Core/Src/position_sensor.c:35:6:ps_sample	56	static
+../Core/Src/position_sensor.c:127:6:ps_print	16	static
+../Core/Src/position_sensor.c:144:6:ps_zero	16	static
+../Core/Src/position_sensor.c:151:6:WriteLUT	16	static
+../Core/Src/position_sensor.c:155:6:ps_filter_init	16	static

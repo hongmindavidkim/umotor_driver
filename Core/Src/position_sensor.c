@@ -11,6 +11,7 @@
 #include "hw_config.h"
 #include "user_config.h"
 
+extern int loop_time;
 
 void ps_warmup(EncoderStruct * encoder, int n){
 	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
@@ -135,7 +136,8 @@ void ps_print(EncoderStruct * encoder){
 	printf("   Multiturn: %.3f", encoder->angle_multiturn[0]);
 	printf("   Electrical: %.3f", encoder->elec_angle);
 	printf("   Turns:  %d", encoder->turns);
-	printf("   Vel: %.4f\n\r", encoder->velocity);
+	printf("   Vel: %.4f", encoder->velocity);
+	printf("   Main loop time: %d\n\r", loop_time);
 	delay_us(10000);
 }
 
