@@ -6545,14 +6545,15 @@ Disassembly of section .text:
  8004b76:	a80e      	add	r0, sp, #56	; 0x38
  8004b78:	f002 fbe4 	bl	8007344 <memset>
  8004b7c:	4831      	ldr	r0, [pc, #196]	; (8004c44 <MX_TIM1_Init+0xf4>)
- 8004b7e:	4b32      	ldr	r3, [pc, #200]	; (8004c48 <MX_TIM1_Init+0xf8>)
+ 8004b7e:	4a32      	ldr	r2, [pc, #200]	; (8004c48 <MX_TIM1_Init+0xf8>)
  8004b80:	6085      	str	r5, [r0, #8]
- 8004b82:	e9c0 3400 	strd	r3, r4, [r0]
- 8004b86:	f44f 637a 	mov.w	r3, #4000	; 0xfa0
- 8004b8a:	e9c0 3403 	strd	r3, r4, [r0, #12]
- 8004b8e:	2201      	movs	r2, #1
- 8004b90:	2380      	movs	r3, #128	; 0x80
- 8004b92:	e9c0 2305 	strd	r2, r3, [r0, #20]
+ 8004b82:	2301      	movs	r3, #1
+ 8004b84:	e9c0 2300 	strd	r2, r3, [r0]
+ 8004b88:	6143      	str	r3, [r0, #20]
+ 8004b8a:	f44f 627a 	mov.w	r2, #4000	; 0xfa0
+ 8004b8e:	2380      	movs	r3, #128	; 0x80
+ 8004b90:	e9c0 2403 	strd	r2, r4, [r0, #12]
+ 8004b94:	6183      	str	r3, [r0, #24]
  8004b96:	f001 fde5 	bl	8006764 <HAL_TIM_Base_Init>
  8004b9a:	b108      	cbz	r0, 8004ba0 <MX_TIM1_Init+0x50>
  8004b9c:	f7ff f994 	bl	8003ec8 <Error_Handler>
