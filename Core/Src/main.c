@@ -275,18 +275,18 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim1); // start main control interrupt
 
   // Check encoder initialization here
-//  int new_offset = 0;
-//  ps_sample(&comm_encoder, 0.001);
-//  HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
-//  drv_enable_gd(drv);
-//  new_offset = check_encoder_init(&comm_encoder, &controller, &comm_encoder_cal);             // status = 1 is good
-//  HAL_Delay(100);
-//  drv_disable_gd(drv);
-//  HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
-//
-//  E_ZERO = new_offset;
-//  comm_encoder.e_zero = E_ZERO;
-//  printf(" Position Sensor Electrical Offset: %d\n\r", E_ZERO);
+  int new_offset = 0;
+  ps_sample(&comm_encoder, 0.001);
+  HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
+  drv_enable_gd(drv);
+  new_offset = check_encoder_init(&comm_encoder, &controller, &comm_encoder_cal);             // status = 1 is good
+  HAL_Delay(100);
+  drv_disable_gd(drv);
+  HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
+
+  E_ZERO = new_offset;
+  comm_encoder.e_zero = E_ZERO;
+  printf(" Position Sensor Electrical Offset: %d\n\r", E_ZERO);
 
   // initialize filter here for position sensor
   HAL_Delay(100);
@@ -325,7 +325,7 @@ int main(void)
 
 	  HAL_Delay(100);
 //	  printf("%d\n\r", loop_time);
-//	  drv_check_faults(drv, &state);
+	  drv_check_faults(drv, &state);
 	 // if(state.state==MOTOR_MODE){
 
 
