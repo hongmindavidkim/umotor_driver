@@ -16,14 +16,16 @@ extern int loop_time;
 void ps_warmup(EncoderStruct * encoder, int n){
 	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
 //	int raw;
+	HAL_StatusTypeDef hal_status;
+	encoder->spi_tx_buff[0] = 0xA6;
+	encoder->spi_tx_buff[1] = 0x00;
+	encoder->spi_tx_buff[2] = 0x00;
+	encoder->spi_tx_buff[3] = 0x00;
+
 	for(int i = 0; i<n; i++){
-		encoder->spi_tx_buff[0] = 0xA6;
-		encoder->spi_tx_buff[1] = 0x00;
-		encoder->spi_tx_buff[2] = 0x00;
-		encoder->spi_tx_buff[3] = 0x00;
+		while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
 		HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
-		HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 4, 100);
-		while( ENC_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
+		hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 4, 100);
 		HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
 		delay_us(100);
 //		raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
@@ -43,16 +45,21 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	//memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float)); // this is much slower for some reason
 
 	/* SPI read/write */
+	HAL_StatusTypeDef hal_status;
 	encoder->spi_tx_buff[0] = 0xA6;
 	encoder->spi_tx_buff[1] = 0x00;
 	encoder->spi_tx_buff[2] = 0x00;
 	encoder->spi_tx_buff[3] = 0x00;
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
 	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
-	HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 4, 100);
-	while( ENC_SPI.State == HAL_SPI_STATE_BUSY );  					// wait for transmission complete
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 4, 100);
 	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
 
-	encoder->raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
+//	encoder->raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
+
+	if (hal_status == HAL_OK){ // only update on HAL OK
+		encoder->raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
+	}
 
 	/* Linearization */
 	encoder->offset_ind1 = (encoder->raw)>>LUT_SHIFT;
