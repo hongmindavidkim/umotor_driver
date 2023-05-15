@@ -59,6 +59,8 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 	if (hal_status == HAL_OK){ // only update on HAL OK
 		encoder->raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
+	} else {
+		encoder->raw = 0;
 	}
 
 	/* Linearization */
