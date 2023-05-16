@@ -133,6 +133,228 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 }
 
+void ps_activate(EncoderStruct * encoder){
+
+	// activate op code is 0xB0
+	HAL_StatusTypeDef hal_status;
+
+	encoder->spi_tx_buff[0] = 0xB0;
+	encoder->spi_tx_buff[1] = 0b10000011; // set RACTIVE and PACTIVE for one device
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 2, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+
+}
+
+void ps_deactivate(EncoderStruct * encoder){
+
+	HAL_StatusTypeDef hal_status;
+
+	encoder->spi_tx_buff[0] = 0xB0;
+	encoder->spi_tx_buff[1] = 0b10000000; // clear RACTIVE and PACTIVE for one device
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 2, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+}
+
+void ps_spi_status(EncoderStruct * encoder){
+
+	HAL_StatusTypeDef hal_status;
+
+	encoder->spi_tx_buff[0] = 0xAD; // register status command
+	encoder->spi_tx_buff[1] = 0x00;
+	encoder->spi_tx_buff[2] = 0x00;
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+
+	encoder->status[0] = (encoder->spi_rx_buff[1]&0xFFFF);
+
+}
+
+void ps_abs_reset(EncoderStruct * encoder){
+
+	// write register: 0xD2
+	// command register address is 0x75
+	// ABS_RESET command is 0x03
+	// register status/data: 0xAD
+
+	HAL_StatusTypeDef hal_status;
+
+	encoder->spi_tx_buff[0] = 0xD2; // write register command
+	encoder->spi_tx_buff[1] = 0x75; // register address to write to
+	encoder->spi_tx_buff[2] = 0x03; // ABS_RESET command
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+	delay_us(10);
+
+	encoder->spi_tx_buff[0] = 0xAD; // register status command
+	encoder->spi_tx_buff[1] = 0x00;
+	encoder->spi_tx_buff[2] = 0x00;
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+
+	encoder->status[0] = (encoder->spi_rx_buff[1]<<8)|(encoder->spi_rx_buff[2]);
+
+}
+
+void ps_non_ver(EncoderStruct * encoder){
+
+	// write register: 0xD2
+	// command register address is 0x75
+	// NON_VER command is 0x04
+	// register status/data: 0xAD
+
+	HAL_StatusTypeDef hal_status;
+
+	encoder->spi_tx_buff[0] = 0xD2; // write register command
+	encoder->spi_tx_buff[1] = 0x75; // register address to write to
+	encoder->spi_tx_buff[2] = 0x04; // NON_VER command
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+	delay_us(10);
+
+	encoder->spi_tx_buff[0] = 0xAD; // register status command
+	encoder->spi_tx_buff[1] = 0x00;
+	encoder->spi_tx_buff[2] = 0x00;
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+
+	encoder->status[0] = (encoder->spi_rx_buff[1]<<8)|(encoder->spi_rx_buff[2]);
+}
+
+void ps_set_filter(EncoderStruct * encoder, uint8_t filt){
+
+	// write register: 0xD2
+	// command register address is 0x0E
+	// register status/data: 0xAD
+
+	HAL_StatusTypeDef hal_status;
+
+	encoder->spi_tx_buff[0] = 0xD2; // write register command
+	encoder->spi_tx_buff[1] = 0x0E; // register address to write to
+	encoder->spi_tx_buff[2] = (filt|0b00000111); // set bits 2:0
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+	delay_us(10);
+
+	encoder->spi_tx_buff[0] = 0xAD; // register status command
+	encoder->spi_tx_buff[1] = 0x00;
+	encoder->spi_tx_buff[2] = 0x00;
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+
+	encoder->status[0] = (encoder->spi_rx_buff[1]<<8)|(encoder->spi_rx_buff[2]);
+
+}
+
+void ps_read_reg(EncoderStruct * encoder, uint8_t addr){
+
+    // read register: 0x97
+    // register status/data: 0xAD
+
+	HAL_StatusTypeDef hal_status;
+
+	encoder->spi_tx_buff[0] = 0x97; // read register command
+	encoder->spi_tx_buff[1] = addr; // register address to read
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 2, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+	delay_us(10);
+
+	encoder->spi_tx_buff[0] = 0xAD; // register status command
+	encoder->spi_tx_buff[1] = 0x00;
+	encoder->spi_tx_buff[2] = 0x00;
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+
+	encoder->status[0] = (encoder->spi_rx_buff[1]<<8)|(encoder->spi_rx_buff[2]);
+}
+
+void ps_full_status(EncoderStruct * encoder){
+
+    // read register: 0x97
+    // register status/data: 0xAD
+
+    // read both status registers:
+    // status0 is address 0x76
+    // status1 is address 0x77
+
+	HAL_StatusTypeDef hal_status;
+
+	encoder->spi_tx_buff[0] = 0x97; // read register command
+	encoder->spi_tx_buff[1] = 0x76; // register address to read
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 2, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+	delay_us(10);
+
+	encoder->spi_tx_buff[0] = 0xAD; // register status command
+	encoder->spi_tx_buff[1] = 0x00;
+	encoder->spi_tx_buff[2] = 0x00;
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+
+	encoder->status[0] = (encoder->spi_rx_buff[1]<<8)|(encoder->spi_rx_buff[2]);
+	delay_us(10);
+
+	encoder->spi_tx_buff[0] = 0x97; // read register command
+	encoder->spi_tx_buff[1] = 0x77; // register address to read
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 2, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+	delay_us(10);
+
+	encoder->spi_tx_buff[0] = 0xAD; // register status command
+	encoder->spi_tx_buff[1] = 0x00;
+	encoder->spi_tx_buff[2] = 0x00;
+
+	while( HAL_SPI_GetState(&ENC_SPI) != HAL_SPI_STATE_READY){;}
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_RESET ); 	// CS low
+	hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 3, 100);
+	HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
+
+	encoder->status[1] = (encoder->spi_rx_buff[1]<<8)|(encoder->spi_rx_buff[2]);
+
+}
+
+
 void ps_print(EncoderStruct * encoder){
 	printf("   Raw: %u", (unsigned int)encoder->raw);
 //	printf("   LUT ind 1: %d", encoder->offset_ind1);
@@ -146,7 +368,22 @@ void ps_print(EncoderStruct * encoder){
 	printf("   Electrical: %.3f", encoder->elec_angle);
 	printf("   Turns:  %d", encoder->turns);
 	printf("   Vel: %.4f", encoder->velocity);
-	printf("   Main loop time: %d\n\r", loop_time);
+	printf("   Main loop time: %d", loop_time);
+
+	uint16_t b0 = encoder->status[0];
+	uint16_t b1 = encoder->status[1];
+	printf("   Status: "); // try to print these in binary
+	printf("0b%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d, ",
+			(b0 >> 15) & 1, (b0 >> 14) & 1, (b0 >> 13) & 1, (b0 >> 12) & 1,
+		    (b0 >> 11) & 1, (b0 >> 10) & 1, (b0 >> 9) & 1, (b0 >> 8) & 1,
+		    (b0 >> 7) & 1, (b0 >> 6) & 1, (b0 >> 5) & 1, (b0 >> 4) & 1,
+		    (b0 >> 3) & 1, (b0 >> 2) & 1, (b0 >> 1) & 1, (b0 >> 0) & 1);
+	printf("0b%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d%d\n\r",
+			(b1 >> 15) & 1, (b1 >> 14) & 1, (b1 >> 13) & 1, (b1 >> 12) & 1,
+			(b1 >> 11) & 1, (b1 >> 10) & 1, (b1 >> 9) & 1, (b1 >> 8) & 1,
+			(b1 >> 7) & 1, (b1 >> 6) & 1, (b1 >> 5) & 1, (b1 >> 4) & 1,
+			(b1 >> 3) & 1, (b1 >> 2) & 1, (b1 >> 1) & 1, (b1 >> 0) & 1);
+
 	delay_us(10000);
 }
 
