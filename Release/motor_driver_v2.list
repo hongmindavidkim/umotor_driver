@@ -5226,8 +5226,8 @@ Disassembly of section .text:
  8003e08:	f1bb 0b01 	subs.w	fp, fp, #1
  8003e0c:	d1cd      	bne.n	8003daa <main+0x5ea>
  8003e0e:	e041      	b.n	8003e94 <main+0x6d4>
- 8003e10:	a0000000 	.word	0xa0000000
- 8003e14:	4008e147 	.word	0x4008e147
+ 8003e10:	80000000 	.word	0x80000000
+ 8003e14:	4008f5c2 	.word	0x4008f5c2
  8003e18:	47ae147b 	.word	0x47ae147b
  8003e1c:	3f847ae1 	.word	0x3f847ae1
  8003e20:	c1480000 	.word	0xc1480000
@@ -6007,20 +6007,20 @@ Disassembly of section .text:
  80046ca:	f44f 7382 	mov.w	r3, #260	; 0x104
  80046ce:	e9c0 2300 	strd	r2, r3, [r0]
  80046d2:	2300      	movs	r3, #0
- 80046d4:	e9c0 3302 	strd	r3, r3, [r0, #8]
- 80046d8:	e9c0 3304 	strd	r3, r3, [r0, #16]
- 80046dc:	e9c0 3308 	strd	r3, r3, [r0, #32]
- 80046e0:	f44f 7100 	mov.w	r1, #512	; 0x200
- 80046e4:	2208      	movs	r2, #8
- 80046e6:	6283      	str	r3, [r0, #40]	; 0x28
- 80046e8:	230a      	movs	r3, #10
- 80046ea:	e9c0 1206 	strd	r1, r2, [r0, #24]
- 80046ee:	62c3      	str	r3, [r0, #44]	; 0x2c
- 80046f0:	f001 fe18 	bl	8006324 <HAL_SPI_Init>
- 80046f4:	b118      	cbz	r0, 80046fe <MX_SPI3_Init+0x3a>
- 80046f6:	e8bd 4008 	ldmia.w	sp!, {r3, lr}
- 80046fa:	f7ff bbe9 	b.w	8003ed0 <Error_Handler>
- 80046fe:	bd08      	pop	{r3, pc}
+ 80046d4:	f44f 7200 	mov.w	r2, #512	; 0x200
+ 80046d8:	e9c0 3302 	strd	r3, r3, [r0, #8]
+ 80046dc:	e9c0 3304 	strd	r3, r3, [r0, #16]
+ 80046e0:	e9c0 2306 	strd	r2, r3, [r0, #24]
+ 80046e4:	e9c0 3308 	strd	r3, r3, [r0, #32]
+ 80046e8:	6283      	str	r3, [r0, #40]	; 0x28
+ 80046ea:	230a      	movs	r3, #10
+ 80046ec:	62c3      	str	r3, [r0, #44]	; 0x2c
+ 80046ee:	f001 fe19 	bl	8006324 <HAL_SPI_Init>
+ 80046f2:	b118      	cbz	r0, 80046fc <MX_SPI3_Init+0x38>
+ 80046f4:	e8bd 4008 	ldmia.w	sp!, {r3, lr}
+ 80046f8:	f7ff bbea 	b.w	8003ed0 <Error_Handler>
+ 80046fc:	bd08      	pop	{r3, pc}
+ 80046fe:	bf00      	nop
  8004700:	200094e4 	.word	0x200094e4
  8004704:	40003c00 	.word	0x40003c00
 
