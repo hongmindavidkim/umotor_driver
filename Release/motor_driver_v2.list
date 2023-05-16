@@ -5226,8 +5226,8 @@ Disassembly of section .text:
  8003e08:	f1bb 0b01 	subs.w	fp, fp, #1
  8003e0c:	d1cd      	bne.n	8003daa <main+0x5ea>
  8003e0e:	e041      	b.n	8003e94 <main+0x6d4>
- 8003e10:	c0000000 	.word	0xc0000000
- 8003e14:	4008cccc 	.word	0x4008cccc
+ 8003e10:	a0000000 	.word	0xa0000000
+ 8003e14:	4008e147 	.word	0x4008e147
  8003e18:	47ae147b 	.word	0x47ae147b
  8003e1c:	3f847ae1 	.word	0x3f847ae1
  8003e20:	c1480000 	.word	0xc1480000
@@ -6011,7 +6011,7 @@ Disassembly of section .text:
  80046d8:	e9c0 3304 	strd	r3, r3, [r0, #16]
  80046dc:	e9c0 3308 	strd	r3, r3, [r0, #32]
  80046e0:	f44f 7100 	mov.w	r1, #512	; 0x200
- 80046e4:	2210      	movs	r2, #16
+ 80046e4:	2208      	movs	r2, #8
  80046e6:	6283      	str	r3, [r0, #40]	; 0x28
  80046e8:	230a      	movs	r3, #10
  80046ea:	e9c0 1206 	strd	r1, r2, [r0, #24]
