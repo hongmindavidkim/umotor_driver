@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 3.141f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
+#define VERSION_NUM 3.142f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
 
 
 /* USER CODE END PM */
@@ -141,7 +141,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  HAL_Delay(500);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -207,7 +207,7 @@ int main(void)
   if(isnan(T_MIN) || T_MIN==-1){T_MIN = -72.0f;}
   if(isnan(T_MAX) || T_MAX==-1){T_MAX = 72.0f;}
 
-  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
+  printf("\r\nFirmware Version Number: %.3f\r\n", VERSION_NUM);
 
   /* Controller Setup */
   if(PHASE_ORDER){							// Timer channel to phase mapping
