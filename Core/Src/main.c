@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 3.12f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
+#define VERSION_NUM 3.13f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
 
 
 /* USER CODE END PM */
