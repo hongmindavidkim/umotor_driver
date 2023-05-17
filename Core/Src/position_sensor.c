@@ -15,7 +15,7 @@ extern int loop_time;
 
 void ps_warmup(EncoderStruct * encoder, int n){
 	/* Hall position sensors noisy on startup.  Take a bunch of samples to clear this data */
-//	int raw;
+	unsigned int raw;
 	HAL_StatusTypeDef hal_status;
 	encoder->spi_tx_buff[0] = 0xA6;
 	encoder->spi_tx_buff[1] = 0x00;
@@ -28,9 +28,10 @@ void ps_warmup(EncoderStruct * encoder, int n){
 		hal_status = HAL_SPI_TransmitReceive(&ENC_SPI, encoder->spi_tx_buff, encoder->spi_rx_buff, 4, 100);
 		HAL_GPIO_WritePin(ENC_CS, GPIO_PIN_SET ); 	// CS high
 		delay_us(100);
-//		raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
+		raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
 //		printf("%d\n\r", raw);
 		delay_us(100);
+		printf("Raw %d: %u", i, raw);
 	}
 }
 
