@@ -31,7 +31,7 @@ void ps_warmup(EncoderStruct * encoder, int n){
 		raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
 //		printf("%d\n\r", raw);
 		delay_us(100);
-		printf("Raw %d: %u", i, raw);
+		printf("Raw %d: %u\n\r", i, raw);
 	}
 }
 
