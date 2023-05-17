@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 3.13f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
+#define VERSION_NUM 3.131f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
 
 
 /* USER CODE END PM */
@@ -159,6 +159,8 @@ int main(void)
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start(&htim2); // enable this to use delay_us() function
   HAL_TIM_Base_Start(&htim3); // enable this to time functions in us
+
+  HAL_Delay(500);
 
   /* Load settings from flash */
   preference_writer_init(&prefs, 6);
