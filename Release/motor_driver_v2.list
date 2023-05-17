@@ -5256,8 +5256,8 @@ Disassembly of section .text:
  8003e78:	f1bb 0b01 	subs.w	fp, fp, #1
  8003e7c:	d1cd      	bne.n	8003e1a <main+0x5f2>
  8003e7e:	e041      	b.n	8003f04 <main+0x6dc>
- 8003e80:	e0000000 	.word	0xe0000000
- 8003e84:	400922d0 	.word	0x400922d0
+ 8003e80:	40000000 	.word	0x40000000
+ 8003e84:	40093333 	.word	0x40093333
  8003e88:	47ae147b 	.word	0x47ae147b
  8003e8c:	3f847ae1 	.word	0x3f847ae1
  8003e90:	c1480000 	.word	0xc1480000
