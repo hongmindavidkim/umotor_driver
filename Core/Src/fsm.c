@@ -254,6 +254,12 @@ extern int CAN_ACTIVE;
 					printf("\n\r\n\r Flash values have been reset. Power cycle to be safe! \n\r\n\r");
 					enter_menu_state(); // re-print menu
 					break;
+				case ENC_RESET_CMD:
+					printf("\n\r\n\r Resetting Encoder Absolute Position\n\r");
+					ps_abs_reset(&comm_encoder);
+					HAL_Delay(25);
+					enter_menu_state();
+					break;
 				}
 			break;
 		case SETUP_MODE:
@@ -288,6 +294,7 @@ extern int CAN_ACTIVE;
 	    printf(" Commands:\n\r");
 	    printf(" m - Motor Mode\n\r");
 	    printf(" c - Calibrate Encoder\n\r");
+	    printf(" r - Reset Encoder\n\r");
 	    printf(" s - Setup\n\r");
 	    printf(" e - Display Encoder\n\r");
 	    printf(" z - Set Zero Position\n\r");
