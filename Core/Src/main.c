@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 3.15f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
+#define VERSION_NUM 3.16f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
 
 
 /* USER CODE END PM */
@@ -276,7 +276,8 @@ int main(void)
 
   // Check encoder initialization here
   int new_offset = 0;
-  ps_sample(&comm_encoder, 0.001);
+  //ps_sample(&comm_encoder, 0.001);
+  delay_us(100);
   HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
   drv_enable_gd(drv);
   new_offset = check_encoder_init(&comm_encoder, &controller, &comm_encoder_cal);             // status = 1 is good
