@@ -18,6 +18,9 @@
 #include "position_sensor.h"
 #include "drv8323.h"
 
+//CAN ACTIVE FLAG
+extern int CAN_ACTIVE;
+
  void run_fsm(FSMStruct * fsmstate){
 	 /* run_fsm is run every commutation interrupt cycle */
 
@@ -66,15 +69,18 @@
 
 		 case MOTOR_MODE:
 			 /* If CAN has timed out, reset all commands */
-			 if((CAN_TIMEOUT > 0 ) && (controller.timeout > CAN_TIMEOUT)){
+			 if((CAN_TIMEOUT > 0 ) && (controller.timeout > CAN_TIMEOUT) && (CAN_ACTIVE==1)){ // ONLY DO THIS IF CAN HAS BEEN RECIEVED
 				 zero_commands(&controller);
+				 //drop into MENU MODE
+				 fsmstate->next_state = MENU_MODE;
+				 fsmstate->ready = 0;
+				 CAN_ACTIVE = 0;
 			 }
-			 /* Otherwise, commutate */
-			 else{
-				 torque_control(&controller);
-				 //field_weaken(&controller); // TODO: add field-weakening back at some point
-				 commutate(&controller, &comm_encoder);
-			 }
+
+			 /* commutate */
+			 torque_control(&controller);
+			 //field_weaken(&controller); // TODO: add field-weakening back at some point
+			 commutate(&controller, &comm_encoder);
 			 controller.timeout ++;
 			 break;
 
@@ -83,6 +89,7 @@
 
 		 case ENCODER_MODE:
 			 if (fsmstate->print_iter == 800){
+				 ps_full_status(&comm_encoder);
 				 ps_print(&comm_encoder);
 //				 printf("Current A: %f, Current B: %f, Bus voltage: %f\n\r", controller.i_a, controller.i_b, controller.v_bus);
 				 fsmstate->print_iter = 0;
@@ -247,6 +254,12 @@
 					printf("\n\r\n\r Flash values have been reset. Power cycle to be safe! \n\r\n\r");
 					enter_menu_state(); // re-print menu
 					break;
+				case ENC_RESET_CMD:
+					printf("\n\r\n\r Resetting Encoder Absolute Position\n\r");
+					ps_abs_reset(&comm_encoder);
+					HAL_Delay(25);
+					enter_menu_state();
+					break;
 				}
 			break;
 		case SETUP_MODE:
@@ -281,6 +294,7 @@
 	    printf(" Commands:\n\r");
 	    printf(" m - Motor Mode\n\r");
 	    printf(" c - Calibrate Encoder\n\r");
+	    printf(" r - Reset Encoder\n\r");
 	    printf(" s - Setup\n\r");
 	    printf(" e - Display Encoder\n\r");
 	    printf(" z - Set Zero Position\n\r");

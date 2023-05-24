@@ -24,7 +24,6 @@ extern "C" {
 #define INIT_TEMP_MODE      6
 #define FAULT_MODE			7 // TODO: implement this with some fast LED flashing to indicate without UART, could be due to bad init or drv
 
-
 #define MENU_CMD			27
 #define MOTOR_CMD			'm'
 #define CAL_CMD				'c'
@@ -33,6 +32,7 @@ extern "C" {
 #define ZERO_CMD			'z'
 #define ENTER_CMD			13
 #define RESET_CMD			'p'
+#define ENC_RESET_CMD		'r'
 
 
 typedef struct{

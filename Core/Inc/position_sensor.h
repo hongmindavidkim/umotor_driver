@@ -36,7 +36,7 @@ typedef struct{
 	int m_zero, e_zero;
 	int offset_lut[N_LUT];
 	uint8_t first_sample;
-
+	uint16_t status[2];
 	//    float position, ElecPosition, ElecOffset, MechPosition, MechOffset,
 	//    float modPosition, oldModPosition, oldVel, velVec[40], MechVelocity, ElecVelocity, ElecVelocityFilt,
 	//    float prev_mech, prev_elec;
@@ -50,6 +50,14 @@ void ps_print(EncoderStruct * encoder);
 void ps_zero(EncoderStruct * encoder);
 void WriteLUT(EncoderStruct * encoder, int new_lut[N_LUT]);
 void ps_filter_init(EncoderStruct * encoder);
+void ps_full_status(EncoderStruct * encoder);
+void ps_spi_status(EncoderStruct * encoder);
+void ps_activate(EncoderStruct * encoder);
+void ps_deactivate(EncoderStruct * encoder);
+void ps_abs_reset(EncoderStruct * encoder);
+void ps_non_ver(EncoderStruct * encoder);
+void ps_set_filter(EncoderStruct * encoder, uint8_t filt);
+
 
 //    PositionSensoriCMU(int CPR, float offset, int ppairs);
 //    virtual void Sample(float dt);

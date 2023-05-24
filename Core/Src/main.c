@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 2.2f // incremented to 2.2 by Andrew 1/20/23
+#define VERSION_NUM 3.15f // incremented to 3.01 by Elijah for CAN retransmission 5/6/23
 
 
 /* USER CODE END PM */
@@ -90,6 +90,9 @@ DRVStruct drv;
 CalStruct comm_encoder_cal;
 CANTxMessage can_tx;
 CANRxMessage can_rx;
+
+//CAN ACTIAVTION FLAG
+int CAN_ACTIVE = 0;
 
 /* init but don't allocate calibration arrays */
 int *error_array = NULL;
@@ -138,7 +141,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  HAL_Delay(500);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -204,7 +207,7 @@ int main(void)
   if(isnan(T_MIN) || T_MIN==-1){T_MIN = -72.0f;}
   if(isnan(T_MAX) || T_MAX==-1){T_MAX = 72.0f;}
 
-  printf("\r\nFirmware Version Number: %.2f\r\n", VERSION_NUM);
+  printf("\r\nFirmware Version Number: %.3f\r\n", VERSION_NUM);
 
   /* Controller Setup */
   if(PHASE_ORDER){							// Timer channel to phase mapping
@@ -287,7 +290,20 @@ int main(void)
 
   // initialize filter here for position sensor
   HAL_Delay(100);
-  ps_filter_init(&comm_encoder);
+//  ps_filter_init(&comm_encoder);
+
+  // average 100 samples for filter init values
+  int num_filt_init = 100;
+  float filt_prev_mech_temp = 0.0f;
+  float filt_prev_elec_temp = 0.0f;
+  for (int i=0; i<num_filt_init; i++){
+	  filt_prev_mech_temp += (1.0/(float)num_filt_init)*comm_encoder.angle_multiturn[0];
+	  filt_prev_elec_temp += (1.0/(float)num_filt_init)*comm_encoder.elec_angle;
+	  HAL_Delay(1); // need to wait for some time to get a new position sample
+  }
+  comm_encoder.filt_prev_mech = filt_prev_mech_temp;
+  comm_encoder.filt_prev_elec = filt_prev_elec_temp;
+
   if (EN_ENC_FILTER == 1){
 	  comm_encoder.filt_enable = 1;
   }
