@@ -43,6 +43,10 @@ extern "C" {
 #define T_MIN					__float_reg[30]									// Torque setpoint lower limit (Nm)
 #define T_MAX					__float_reg[31]									// Torque setpoint upper limit (Nm)
 
+#define K_SCALE					__float_reg[32]
+#define KI_D					__float_reg[33]
+#define KI_Q					__float_reg[34]
+
 // length of int reg is 256
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration
 #define CAN_ID                  __int_reg[1]                                    // CAN bus ID
