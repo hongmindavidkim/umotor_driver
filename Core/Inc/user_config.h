@@ -16,9 +16,9 @@ extern "C" {
 #define THETA_MIN               __float_reg[7]                                  // Minimum position setpoint
 #define THETA_MAX               __float_reg[8]                                  // Maximum position setpoint
 
-//#define K_SCALE					__float_reg[9]									// Current Controller KP scaled w/ BW
-//#define KI_D					__float_reg[10]									// Current Controller KI D-axis
-//#define KI_Q					__float_reg[11]									// Current Controller KI Q-axis
+#define K_SCALE					__float_reg[9]									// Current Controller KP scaled w/ BW
+#define KI_D					__float_reg[10]									// Current Controller KI D-axis
+#define KI_Q					__float_reg[11]									// Current Controller KI Q-axis
 
 #define PPAIRS					__float_reg[12]									// Number of motor pole-pairs
 #define GR						__float_reg[13]									// Gear ratio
@@ -42,10 +42,6 @@ extern "C" {
 #define KD_MAX					__float_reg[29]									// Max velocity gain (N-m/rad/s)
 #define T_MIN					__float_reg[30]									// Torque setpoint lower limit (Nm)
 #define T_MAX					__float_reg[31]									// Torque setpoint upper limit (Nm)
-
-#define K_SCALE					__float_reg[32]
-#define KI_D					__float_reg[33]
-#define KI_Q					__float_reg[34]
 
 // length of int reg is 256
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration
