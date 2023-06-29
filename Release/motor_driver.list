@@ -5031,10 +5031,10 @@ Disassembly of section .text:
  8003bec:	40a00000 	.word	0x40a00000
  8003bf0:	41a80000 	.word	0x41a80000
  8003bf4:	40c00000 	.word	0x40c00000
- 8003bf8:	3649539c 	.word	0x3649539c
+ 8003bf8:	3951b717 	.word	0x3951b717
  8003bfc:	3eddb22d 	.word	0x3eddb22d
- 8003c00:	390b75ea 	.word	0x390b75ea
- 8003c04:	3d18c7e3 	.word	0x3d18c7e3
+ 8003c00:	39c73abd 	.word	0x39c73abd
+ 8003c04:	3d851eb8 	.word	0x3d851eb8
  8003c08:	3fa00000 	.word	0x3fa00000
  8003c0c:	6523      	str	r3, [r4, #80]	; 0x50
  8003c0e:	edd4 7a15 	vldr	s15, [r4, #84]	; 0x54
