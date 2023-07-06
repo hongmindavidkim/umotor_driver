@@ -322,9 +322,9 @@ extern int CAN_ACTIVE;
 	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "y", "Encoder Linearization Enable", "0", "1", EN_ENC_LINEARIZE);
 		printf(" %-4s %-31s %-5s %-6s %d\n\r", "z", "Encoder Filter Enable", "0", "1", EN_ENC_FILTER);
 		printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Phase Order", "0", "1", PHASE_ORDER);
-	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Current Controller K_SCALE", "-", "-", K_SCALE); // TODO: decide if these should be in flash or not
-		printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Current Controller KI_D", "-", "-", KI_D);
-		printf(" %-4s %-31s %-5s %-6s %f\n\r", "-", "Current Controller KI_Q", "-", "-", KI_Q);
+	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "s", "Current Controller K_SCALE", "0", "0.001", K_SCALE);
+		printf(" %-4s %-31s %-5s %-6s %f\n\r", "r", "Current Controller KI_D", "0", "0.5", KI_D);
+		printf(" %-4s %-31s %-5s %-6s %f\n\r", "u", "Current Controller KI_Q", "0", "0.5", KI_Q);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "b", "Current Bandwidth (Hz)", "100", "2000", I_BW);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "l", "Current Limit (A)", "0.0", "60.0", I_MAX);
 	    printf(" %-4s %-31s %-5s %-6s %.1f\n\r", "f", "FW Current Limit (A)", "0.0", "33.0", I_FW_MAX);
@@ -355,18 +355,18 @@ extern int CAN_ACTIVE;
 	 /* Collects user input from serial (maybe eventually CAN) and updates settings */
 
 	 switch (fsmstate->cmd_id){
-//		 case 's':
-//			 K_SCALE = fmaxf(fminf(atof(fsmstate->cmd_buff), 0.1f), 0.0f);
-//			 printf("K_SCALE set to %f\r\n", K_SCALE);
-//			 break;
-//		 case 'r':
-//			 KI_D = fmaxf(fminf(atof(fsmstate->cmd_buff), 1.0f), 0.0f);
-//			 printf("KI_D set to %f\r\n", KI_D);
-//			 break;
-//		 case 'q':
-//			 KI_Q = fmaxf(fminf(atof(fsmstate->cmd_buff), 1.0f), 0.0f);
-//			 printf("KI_Q set to %f\r\n", KI_Q);
-//			 break;
+		 case 's':
+			 K_SCALE = fmaxf(fminf(atof(fsmstate->cmd_buff), 0.001f), 0.0f);
+			 printf("K_SCALE set to %f\r\n", K_SCALE);
+			 break;
+		 case 'r':
+			 KI_D = fmaxf(fminf(atof(fsmstate->cmd_buff), 0.5f), 0.0f);
+			 printf("KI_D set to %f\r\n", KI_D);
+			 break;
+		 case 'u':
+			 KI_Q = fmaxf(fminf(atof(fsmstate->cmd_buff), 0.5f), 0.0f);
+			 printf("KI_Q set to %f\r\n", KI_Q);
+			 break;
  		 case 'y':
  			 EN_ENC_LINEARIZE = atoi(fsmstate->cmd_buff);
  			 if (EN_ENC_LINEARIZE!=0) { EN_ENC_LINEARIZE = 1; }

@@ -16,9 +16,9 @@ extern "C" {
 #define THETA_MIN               __float_reg[7]                                  // Minimum position setpoint
 #define THETA_MAX               __float_reg[8]                                  // Maximum position setpoint
 
-//#define K_SCALE					__float_reg[9]									// Current Controller KP scaled w/ BW
-//#define KI_D					__float_reg[10]									// Current Controller KI D-axis
-//#define KI_Q					__float_reg[11]									// Current Controller KI Q-axis
+#define K_SCALE					__float_reg[9]									// Current Controller KP scaled w/ BW
+#define KI_D					__float_reg[10]									// Current Controller KI D-axis
+#define KI_Q					__float_reg[11]									// Current Controller KI Q-axis
 
 #define PPAIRS					__float_reg[12]									// Number of motor pole-pairs
 #define GR						__float_reg[13]									// Gear ratio
