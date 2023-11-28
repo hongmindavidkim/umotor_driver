@@ -206,11 +206,11 @@ extern int CAN_ACTIVE;
 
  }
 
- void update_fsm(FSMStruct * fsmstate, char fsm_input){
+ void update_fsm(FSMStruct * fsmstate, char fsm_input) {
 	 /*update_fsm is only run when new state-change information is received
 	  * on serial terminal input or CAN input
 	  */
-	if(fsm_input == MENU_CMD){	// escape to exit to rest mode
+	if(fsm_input == MENU_CMD) {	// escape to exit to rest mode
 		fsmstate->next_state = MENU_MODE;
 		fsmstate->ready = 0;
 		if (fsmstate->state == MENU_MODE){
@@ -218,9 +218,9 @@ extern int CAN_ACTIVE;
 		}
 		return;
 	}
-	switch(fsmstate->state){
+	switch (fsmstate->state) {
 		case MENU_MODE:
-			switch (fsm_input){
+			switch (fsm_input) {
 				case CAL_CMD:
 					fsmstate->next_state = CALIBRATION_MODE;
 					fsmstate->ready = 0;
@@ -238,15 +238,19 @@ extern int CAN_ACTIVE;
 					fsmstate->ready = 0;
 					break;
 				case ZERO_CMD:
-					comm_encoder.m_zero = 0;
-					ps_sample(&comm_encoder, DT);
-					int zero_count = comm_encoder.count;
-					M_ZERO = zero_count;
+//					comm_encoder.m_zero = 0;
+//					ps_sample(&comm_encoder, DT);		// seems to freeze the fw but only sometimes
+//					int zero_count = comm_encoder.count;
+//					M_ZERO = zero_count;
+					ps_zero(&comm_encoder);
+					E_ZERO = comm_encoder.e_zero;
+					M_ZERO = comm_encoder.m_zero;
 					if (!preference_writer_ready(prefs)){ preference_writer_open(&prefs);}
 					preference_writer_flush(&prefs);
 					preference_writer_close(&prefs);
 					preference_writer_load(prefs);
-					printf("\n\r\n\r  Saved new zero position:  %d\n\r\n\r", M_ZERO);
+					printf("\n\r\n\r  Saved new electrical zero position:  %d\n\r",     E_ZERO);
+					printf(        "  Saved new mechanical zero position:  %d\n\r\n\r", M_ZERO);
 					enter_menu_state(); // re-print menu
 					break;
 				case RESET_CMD:
@@ -263,20 +267,18 @@ extern int CAN_ACTIVE;
 				}
 			break;
 		case SETUP_MODE:
-			if(fsm_input == ENTER_CMD){
+			if (fsm_input == ENTER_CMD) {
 				process_user_input(fsmstate);
 				break;
 			}
-			if(fsmstate->bytecount == 0){fsmstate->cmd_id = fsm_input;}
-			else{
+			if (fsmstate->bytecount == 0) fsmstate->cmd_id = fsm_input;
+			else {
 				fsmstate->cmd_buff[fsmstate->bytecount-1] = fsm_input;
 				//fsmstate->bytecount = fsmstate->bytecount%(sizeof(fsmstate->cmd_buff)/sizeof(fsmstate->cmd_buff[0])); // reset when buffer is full
 			}
 			fsmstate->bytecount++;
 			/* If enter is typed, process user input */
-
 			break;
-
 		case ENCODER_MODE:
 			break;
 		case MOTOR_MODE:

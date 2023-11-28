@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 3.18f
+#define VERSION_NUM 3.19f
 
 
 /* USER CODE END PM */
@@ -289,9 +289,9 @@ int main(void)
   drv_disable_gd(drv);
   HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
 
-  E_ZERO = new_offset;
-  comm_encoder.e_zero = E_ZERO;
-  printf(" Position Sensor Electrical Offset: %d\n\r", E_ZERO);
+//  E_ZERO = new_offset;
+  comm_encoder.e_zero = new_offset;
+  printf(" Position Sensor Electrical Offset: %d\n\r", comm_encoder.e_zero);
 
   // initialize filter here for position sensor
   HAL_Delay(100);

@@ -35,13 +35,13 @@ void ps_warmup(EncoderStruct * encoder, int n){
 	}
 }
 
-void ps_sample(EncoderStruct * encoder, float dt){
+void ps_sample(EncoderStruct * encoder, float dt) {
 	/* updates EncoderStruct encoder with the latest sample
 	 * after elapsed time dt */
 
 	/* Shift around previous samples */
 	encoder->old_angle = encoder->angle_singleturn;
-	for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];}
+	for (int i=N_POS_SAMPLES-1; i>0; i--) encoder->angle_multiturn[i] = encoder->angle_multiturn[i-1];
 	//for(int i = N_POS_SAMPLES-1; i>0; i--){encoder->count_buff[i] = encoder->count_buff[i-1];}
 	//memmove(&encoder->angle_multiturn[1], &encoder->angle_multiturn[0], (N_POS_SAMPLES-1)*sizeof(float)); // this is much slower for some reason
 
@@ -58,7 +58,7 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 //	encoder->raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
 
-	if (hal_status == HAL_OK){ // only update on HAL OK
+	if (hal_status == HAL_OK) { // only update on HAL OK
 		encoder->raw = ((encoder->spi_rx_buff[1]<<16)|(encoder->spi_rx_buff[2]<<8)|(encoder->spi_rx_buff[3]))>>5;
 	} else {
 		encoder->raw = 0;
@@ -81,12 +81,12 @@ void ps_sample(EncoderStruct * encoder, float dt){
 
 	/* Real angles in radians */
 	// MAPPED FROM -PI to PI, instead of 0 to 2*PI
-	encoder->angle_singleturn = TWO_PI_F*((float)(encoder->count-M_ZERO))/((float)ENC_CPR);
+	encoder->angle_singleturn = TWO_PI_F*((float)(encoder->count-encoder->m_zero))/((float)ENC_CPR) + encoder->init_offset;
 //	encoder->angle_singleturn = encoder->angle_singleturn<0 ? encoder->angle_singleturn + TWO_PI_F : encoder->angle_singleturn;
 	encoder->angle_singleturn = encoder->angle_singleturn<-PI_F ? encoder->angle_singleturn + TWO_PI_F : encoder->angle_singleturn;
 	encoder->angle_singleturn = encoder->angle_singleturn>PI_F  ? encoder->angle_singleturn - TWO_PI_F : encoder->angle_singleturn;
 
-	encoder->elec_angle = (encoder->ppairs*(float)(encoder->count-E_ZERO))/((float)ENC_CPR);
+	encoder->elec_angle = (encoder->ppairs*(float)(encoder->count-encoder->e_zero))/((float)ENC_CPR);
 	int mod_angle = (int)encoder->elec_angle;
 	encoder->elec_angle = TWO_PI_F*(encoder->elec_angle - (float)mod_angle);
 	encoder->elec_angle = encoder->elec_angle<0 ? encoder->elec_angle + TWO_PI_F : encoder->elec_angle;	// Add 2*pi to negative numbers
@@ -117,10 +117,12 @@ void ps_sample(EncoderStruct * encoder, float dt){
 		encoder->angle_multiturn[0] = encoder->filt_prev_mech;
 		encoder->elec_angle = encoder->filt_prev_elec;
 		encoder->single_vel = 0.0;
+		encoder->filt_triggered = 1;
 	}
 	else {
 		encoder->filt_prev_mech = encoder->angle_multiturn[0];
 		encoder->filt_prev_elec = encoder->elec_angle;
+		encoder->filt_triggered = 0;
 	}
 
 	float sum = encoder->single_vel;
@@ -131,7 +133,6 @@ void ps_sample(EncoderStruct * encoder, float dt){
 	encoder->vel_vec[0] = encoder->single_vel;
 	encoder->velocity =  sum/((float)N_POS_SAMPLES);
 	encoder->elec_velocity = encoder->ppairs*encoder->velocity;
-
 }
 
 void ps_activate(EncoderStruct * encoder){
@@ -385,14 +386,16 @@ void ps_print(EncoderStruct * encoder){
 			(b1 >> 7) & 1, (b1 >> 6) & 1, (b1 >> 5) & 1, (b1 >> 4) & 1,
 			(b1 >> 3) & 1, (b1 >> 2) & 1, (b1 >> 1) & 1, (b1 >> 0) & 1);
 
+	if (encoder->filt_triggered) printf("     -> bad position sample.\n\r");
+
 	delay_us(10000);
 }
 
 void ps_zero(EncoderStruct * encoder){
 	encoder->turns = 0;
-	encoder->m_zero = 0;
-	ps_sample(encoder, DT); //.00025f);
-	encoder->m_zero = encoder->angle_singleturn;
+//	encoder->m_zero = 0;
+//	ps_sample(encoder, DT); //.00025f); // don't do this either
+	encoder->m_zero = encoder->count;
 }
 
 void WriteLUT(EncoderStruct * encoder,  int new_lut[N_LUT]){

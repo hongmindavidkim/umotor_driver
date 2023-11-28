@@ -188,15 +188,15 @@ void measure_lr(EncoderStruct *encoder, ControllerStruct *controller, CalStruct 
 }
 
 
-int check_encoder_init(EncoderStruct *encoder, ControllerStruct *controller, CalStruct *cal){
-
+int check_encoder_init(EncoderStruct *encoder, ControllerStruct *controller, CalStruct *cal) {
 	printf("\n\r Checking encoder initialization\n\r");
+	encoder->init_offset = 0;
 
 	float theta_elec_read = 0.0f;
 	float theta_elec_err = 0.0f;
 	int theta_elec_counts = 0;
 
-	for(int i = 0; i<10000; i++){		// Set voltage angle to zero, wait for rotor position to settle
+	for (int i = 0; i<10000; i++) {		// Set voltage angle to zero, wait for rotor position to settle
 		cal->theta_ref = PI_F/2.0f;//W_CAL*cal->time;
 		cal->cal_position.elec_angle = cal->theta_ref;
 		cal->cal_position.elec_velocity = 0;
@@ -205,7 +205,7 @@ int check_encoder_init(EncoderStruct *encoder, ControllerStruct *controller, Cal
 		commutate(controller, &cal->cal_position);
 	}
 
-	for(int i = 0; i<20000; i++){		// Set voltage angle to zero, wait for rotor position to settle
+	for (int i = 0; i<20000; i++) {		// Set voltage angle to zero, wait for rotor position to settle
 		cal->theta_ref = 0.0f;//W_CAL*cal->time;
 		cal->cal_position.elec_angle = cal->theta_ref;
 		cal->cal_position.elec_velocity = 0;
@@ -219,28 +219,30 @@ int check_encoder_init(EncoderStruct *encoder, ControllerStruct *controller, Cal
 	}
 
 	// how far from elec angle of 0?
-	if (theta_elec_read > PI_F) { theta_elec_err = theta_elec_read - 2.0f*PI_F; } // wrap from -PI to PI instead of 0 to 2*PI
-	else { theta_elec_err = theta_elec_read; };
+	if (theta_elec_read > PI_F) theta_elec_err = theta_elec_read - 2.0f*PI_F; // wrap from -PI to PI instead of 0 to 2*PI
+	else theta_elec_err = theta_elec_read;
 
 	float diff_zeros = ((float)(theta_elec_counts-E_ZERO))*PPAIRS/((float)ENC_CPR);
 	int diff_int = diff_zeros;
 	diff_zeros = diff_zeros - (float)diff_int;
+	float init_offset_rot = -diff_zeros;
 	diff_zeros = diff_zeros>0.5 ? diff_zeros-1.0 : diff_zeros<-0.5 ? diff_zeros+1.0 : diff_zeros;
 
 	// Print difference and status of initialization
 	if ((theta_elec_err < (PI_F/2.0f)) && (theta_elec_err > (-PI_F/2.0f)) ) { // initialization is good
-		printf(" Good initialization! \n\r");
-		printf(" Angle Error = %.2f, Old Zero = %d, New Zero = %d, Zero Diff (Elec Rots) = %.2f\r\n", theta_elec_err, E_ZERO, theta_elec_counts, diff_zeros);
 		encoder->init_status = 1;
+		encoder->init_offset = 0;
+		printf(" Good initialization! \n\r");
 	} else { // electrical angle error is larger than 90deg
-		printf(" BAD initialization! \n\r");
-		printf(" Angle Error = %.2f, Old Zero = %d, New Zero = %d, Zero Diff (Elec Rots) = %.2f\r\n", theta_elec_err, E_ZERO, theta_elec_counts, diff_zeros);
 		encoder->init_status = 0;
+		encoder->init_offset = TWO_PI_F*init_offset_rot/(float)PPAIRS;
+		printf(" BAD initialization! Mechanical offset angle = %.3f \n\r", encoder->init_offset);
 	}
+
+	printf(" Angle Error = %.2f, Old Zero = %d, New Zero = %d, Zero Diff (Elec Rots) = %.2f\r\n", theta_elec_err, E_ZERO, theta_elec_counts, diff_zeros);
 
 	// return encoder->elec_angle? encoder->count?
 	return theta_elec_counts; //theta_elec_read;
-
 } // end check_encoder_init function
 
 

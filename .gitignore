@@ -1,0 +1,9 @@
+# project build files
+*.o
+*.d
+*.su
+*.cyclo
+*.bin
+*.elf
+*.list
+*.ap
