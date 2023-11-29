@@ -8,3 +8,5 @@
 *.list
 *.ap
 *.map
+Debug/*
+Release/*
