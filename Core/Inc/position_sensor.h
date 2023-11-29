@@ -27,8 +27,9 @@ typedef struct{
 	float angle_singleturn, old_angle, angle_multiturn[N_POS_SAMPLES], elec_angle, velocity, elec_velocity, ppairs, vel2;
 	float output_angle_multiturn;
 	float filt_prev_mech, filt_prev_elec;
-	float vel_vec[N_POS_SAMPLES], single_vel;
-	int filt_enable, filt_triggered;
+	float vel_vec[N_POS_SAMPLES], single_vel, filter_check_vel;
+	int filt_enable, filt_num_samples, filt_time_us;
+	
 	int init_status;
 	float init_offset;
 	int offset_interp, offset1, offset2, offset_ind1, offset_ind2;

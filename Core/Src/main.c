@@ -63,7 +63,8 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 3.19f
+#define VERSION_NUM 3.20f
+
 
 
 /* USER CODE END PM */

@@ -21,19 +21,19 @@
 //CAN ACTIVE FLAG
 extern int CAN_ACTIVE;
 
- void run_fsm(FSMStruct * fsmstate){
+void run_fsm(FSMStruct * fsmstate){
 	 /* run_fsm is run every commutation interrupt cycle */
 
 	 /* state transition management */
-	 if(fsmstate->next_state != fsmstate->state){
+	 if (fsmstate->next_state != fsmstate->state){
 		 fsm_exit_state(fsmstate);		// safely exit the old state
-		 if(fsmstate->ready){			// if the previous state is ready, enter the new state
+		 if (fsmstate->ready) {			// if the previous state is ready, enter the new state
 			 fsmstate->state = fsmstate->next_state;
 			 fsm_enter_state(fsmstate);
 		 }
 	 }
 
-	 switch(fsmstate->state){
+	 switch (fsmstate->state) {
 		 case MENU_MODE:
 			 break;
 
@@ -111,9 +111,8 @@ extern int CAN_ACTIVE;
 			 }
 
 			 break;
-	 }
-
- }
+	}
+}
 
  void fsm_enter_state(FSMStruct * fsmstate){
 	 /* Called when entering a new state

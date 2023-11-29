@@ -110,19 +110,26 @@ void ps_sample(EncoderStruct * encoder, float dt) {
 
 	// old velocity calculation modified to match MBed code calculation of velocity!
 	//encoder->velocity = (encoder->angle_multiturn[0] - encoder->angle_multiturn[N_POS_SAMPLES-1])/(dt*(float)(N_POS_SAMPLES-1));
-	encoder->single_vel = (encoder->angle_multiturn[0] - encoder->angle_multiturn[1])/dt;
+
+	encoder->single_vel = (encoder->angle_multiturn[0] - encoder->angle_multiturn[1]) / dt;
+
+//	encoder->filter_check_vel = encoder->single_vel;
+	encoder->filter_check_vel = encoder->single_vel * dt * 1000000.0 / (float)(encoder->filt_time_us+loop_time);
 
 	// Filter out bad position samples
-	if ( (encoder->filt_enable==1) && ((encoder->single_vel > (V_MAX*GR)) || (encoder->single_vel < (V_MIN*GR))) ) {
+	if ( (encoder->filt_enable==1) && ((encoder->filter_check_vel > (V_MAX*GR)) || (encoder->filter_check_vel < (V_MIN*GR))) ) {
 		encoder->angle_multiturn[0] = encoder->filt_prev_mech;
 		encoder->elec_angle = encoder->filt_prev_elec;
 		encoder->single_vel = 0.0;
-		encoder->filt_triggered = 1;
+		encoder->filt_num_samples += 1;
+		encoder->filt_time_us += loop_time;
+
 	}
 	else {
 		encoder->filt_prev_mech = encoder->angle_multiturn[0];
 		encoder->filt_prev_elec = encoder->elec_angle;
-		encoder->filt_triggered = 0;
+		encoder->filt_num_samples = 0;
+		encoder->filt_time_us = 0;
 	}
 
 	float sum = encoder->single_vel;
@@ -385,8 +392,6 @@ void ps_print(EncoderStruct * encoder){
 			(b1 >> 11) & 1, (b1 >> 10) & 1, (b1 >> 9) & 1, (b1 >> 8) & 1,
 			(b1 >> 7) & 1, (b1 >> 6) & 1, (b1 >> 5) & 1, (b1 >> 4) & 1,
 			(b1 >> 3) & 1, (b1 >> 2) & 1, (b1 >> 1) & 1, (b1 >> 0) & 1);
-
-	if (encoder->filt_triggered) printf("     -> bad position sample.\n\r");
 
 	delay_us(10000);
 }
