@@ -22,7 +22,7 @@ extern "C" {
 
 #define PPAIRS					__float_reg[12]									// Number of motor pole-pairs
 #define GR						__float_reg[13]									// Gear ratio
-#define KT_OUT						__float_reg[14]									// Torque Constant (N-m/A)
+#define KT_OUT					__float_reg[14]									// Torque Constant (N-m/A)
 #define L_D						__float_reg[15]									// D-axis inductance
 #define L_Q						__float_reg[16]									// Q-axis inductance
 #define R_PHASE					__float_reg[17]									// Single phase resistance
@@ -42,6 +42,9 @@ extern "C" {
 #define KD_MAX					__float_reg[29]									// Max velocity gain (N-m/rad/s)
 #define T_MIN					__float_reg[30]									// Torque setpoint lower limit (Nm)
 #define T_MAX					__float_reg[31]									// Torque setpoint upper limit (Nm)
+
+#define KT_1					__float_reg[32]									// Linear Torque Constant (Nm/A)
+#define KT_2					__float_reg[33]									// Quadratic Torque Constant (Nm/A^2)
 
 // length of int reg is 256
 #define PHASE_ORDER             __int_reg[0]                                    // Phase swapping during calibration

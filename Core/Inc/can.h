@@ -55,17 +55,17 @@ typedef struct{
 	uint8_t data[8];
 	CAN_RxHeaderTypeDef rx_header;
 	CAN_FilterTypeDef filter;
-}CANRxMessage ;
+} CANRxMessage;
 
 typedef struct{
 	uint8_t id;
-	uint8_t data[6];
+	uint8_t data[8];
 	CAN_TxHeaderTypeDef tx_header;
-}CANTxMessage ;
+} CANTxMessage;
 
 void can_rx_init(CANRxMessage *msg);
 void can_tx_init(CANTxMessage *msg);
-void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t);
+void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t, float t_des);
 void unpack_cmd(CANRxMessage msg, float *commands);
 /* USER CODE END Prototypes */
 

@@ -40,12 +40,13 @@
 #define CAN_H			hcan1				// CAN handle
 
 /* Other hardware-related constants */
-#define I_SCALE 			0.0201416f  // Amps per A/D Count at 40X amplifier gain
-#define V_SCALE 			0.0257812f   // Bus volts per A/D Count (changed to match Mbed fw)
+#define I_SCALE				0.0402832f		// Amps per ADC count at 20X amplifier gain
+#define V_SCALE 			0.0257812f		// Bus volts per A/D Count (changed to match Mbed fw)
 #define DTC_MAX 			0.94f          	// Max duty cycle
 #define DTC_MIN 			0.0f          	// Min duty cycle
 #define DTC_COMP 			0.000f          // deadtime compensation (100 ns / 25 us)
 #define DT					0.00005f //.000025f		// Loop period
+
 //#define EN_ENC_LINEARIZATION 1				// Enable/disable encoder linearization
 
 // using flash values from CAN limits and gear ratio

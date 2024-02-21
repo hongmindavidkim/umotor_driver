@@ -313,7 +313,8 @@ void run_fsm(FSMStruct * fsmstate){
 	    printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Encoder Mech Zero", "0", "524288", M_ZERO);
 		printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Encoder Elec Zero", "0", "524288", E_ZERO);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "g", "Gear Ratio", "0", "-", GR);
-	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "k", "Output Torque Constant (N-m/A)", "0", "-", KT_OUT);
+	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "k", "Linear Torque Constant (Nm/A)", "0", "-", KT_1);
+	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "w", "Quadratic Torque Constant (Nm/A^2)", "-", "0", KT_2);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "o", "Motor Phase Resistance (ohms)", "0.0", "10.0", R_PHASE);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "j", "D-axis inductance (H)", "0", "0.1", L_D);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "e", "Q-axis inductance (H)", "0", "0.1", L_Q);
@@ -423,8 +424,12 @@ void run_fsm(FSMStruct * fsmstate){
 			 printf("GR set to %f\r\n", GR);
 			 break;
 		 case 'k':
-			 KT_OUT = fmaxf(atof(fsmstate->cmd_buff), 0.0001f);	// Limit prevents divide by zero.  Seems like a reasonable LB?
-			 printf("KT set to %f\r\n", KT_OUT);
+			 KT_1 = fmaxf(atof(fsmstate->cmd_buff), 0.0001f);	// Limit prevents divide by zero.  Seems like a reasonable LB?
+			 printf("KT_1 set to %f\r\n", KT_1);
+			 break;
+		 case 'w':
+			 KT_2 = fminf(atof(fsmstate->cmd_buff), 0.0f);
+			 printf("KT_2 set to %f\r\n", KT_2);
 			 break;
 
 		 case 'j':

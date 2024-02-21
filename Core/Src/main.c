@@ -63,7 +63,7 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
-#define VERSION_NUM 3.20f
+#define VERSION_NUM 3.21f
 
 
 
@@ -212,6 +212,9 @@ int main(void)
   if(isnan(T_MIN) || T_MIN==-1){T_MIN = -72.0f;}
   if(isnan(T_MAX) || T_MAX==-1){T_MAX = 72.0f;}
 
+  if(isnan(KT_1) || KT_1==-1){KT_1 = 1.0f;}
+  if(isnan(KT_2) || KT_2==-1){KT_2 = 0.0f;}
+
   printf("\r\nFirmware Version Number: %.3f\r\n", VERSION_NUM);
 
   /* Controller Setup */
@@ -247,11 +250,11 @@ int main(void)
   HAL_Delay(1);
   drv_write_DCR(drv, 0x0, DIS_GDF_DIS, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1); //  TODO: enable gate drive fault?
   HAL_Delay(1);
-  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, DIS_SEN_EN, 0x1, 0x1, 0x1, SEN_LVL_1_0); // calibrate shunt amplifiers
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_20, DIS_SEN_EN, 0x1, 0x1, 0x1, SEN_LVL_1_0); // calibrate shunt amplifiers
   HAL_Delay(1);
   zero_current(&controller); // moved this between the two drv_write_CSACR calls to match mbed fw version
   HAL_Delay(1);
-  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, DIS_SEN_DIS, 0x0, 0x0, 0x0, SEN_LVL_1_0); // TODO: enable sensing of overcurrent fault?
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_20, DIS_SEN_DIS, 0x0, 0x0, 0x0, SEN_LVL_1_0); // TODO: enable sensing of overcurrent fault?
   HAL_Delay(1);
   drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_NONE, OCP_DEG_8US, VDS_LVL_1_88); // TODO: reduce VDS level and add OCP_RETRY?
   HAL_Delay(1);

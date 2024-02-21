@@ -158,8 +158,7 @@ void init_controller_params(ControllerStruct *controller){
     controller->alpha = 1.0f - 1.0f/(1.0f - DT*I_BW*TWO_PI_F);
     controller->ki_fw = .1f*controller->ki_d;
     controller->phase_order = PHASE_ORDER;
-    if(I_MAX <= 40.0f){controller->i_scale = I_SCALE;}
-    else{controller->i_scale = 2.0f*I_SCALE;}
+    controller->i_scale = I_SCALE;
     for(int i = 0; i<128; i++)	// Approximate duty cycle linearization
     {
         controller->inverter_tab[i] = 1.0f + 1.2f*exp(-0.0078125f*i/.032f);
@@ -304,12 +303,17 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 
 
 void torque_control(ControllerStruct *controller){
-
     float torque_des = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
-    controller->i_q_des = fast_fmaxf(fast_fminf(torque_des/(KT_OUT), controller->i_max), -controller->i_max);
+
+    float iq_des_nom = torque_des / KT_1;
+    if (KT_2 < -0.000001f) iq_des_nom = (-KT_1 + sqrt(KT_1*KT_1 + 4*KT_2*torque_des)) / (2*KT_2);
+
+    controller->i_q_des = fast_fmaxf(fast_fminf(iq_des_nom, controller->i_max), -controller->i_max);
     controller->i_d_des = 0.0f;
 
-    }
+    controller->i_q_des_filt = (1.0f-CURRENT_FILT_ALPHA)*controller->i_q_des_filt + CURRENT_FILT_ALPHA*controller->i_q_des;
+    controller->i_d_des_filt = (1.0f-CURRENT_FILT_ALPHA)*controller->i_d_des_filt + CURRENT_FILT_ALPHA*controller->i_d_des;
+}
 
 
 

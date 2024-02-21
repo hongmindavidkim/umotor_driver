@@ -277,7 +277,11 @@ void can_tx_rx(void){
 //		printf("RX: %X, %X, %X, %X, %X, %X, %X, %X\n\r", can_rx.data[0], can_rx.data[1], can_rx.data[2], can_rx.data[3], can_rx.data[4], can_rx.data[5], can_rx.data[6], can_rx.data[7]);
 //		HAL_GPIO_TogglePin(LED); //Toggle the state of led on can rx
 		uint32_t TxMailbox;
-		pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, controller.i_q_filt*KT_OUT);	// Pack response
+
+		float torque_estimate = KT_2*controller.i_q_filt*controller.i_q_filt + KT_1*controller.i_q_filt;
+		float desired_torque = KT_2*controller.i_q_des_filt*controller.i_q_des_filt + KT_1*controller.i_q_des_filt;
+
+		pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, torque_estimate, desired_torque);	// Pack response
 		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 
 		/* Check for special Commands */
