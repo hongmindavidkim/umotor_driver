@@ -164,6 +164,8 @@ void init_controller_params(ControllerStruct *controller){
         controller->inverter_tab[i] = 1.0f + 1.2f*exp(-0.0078125f*i/.032f);
     }
 
+    if (KT_2 > 0.000001f) controller->t_alg_max = fsquare(KT_1)/(4.0f*KT_2) - 0.001f;
+
     }
 
 void reset_foc(ControllerStruct *controller){
@@ -182,6 +184,8 @@ void reset_foc(ControllerStruct *controller){
     controller->v_d = 0;
     controller->fw_int = 0;
     controller->otw_flag = 0;
+    controller->t_des = 0;
+    controller->t_des_filt = 0;
 
     }
 
@@ -303,10 +307,19 @@ void commutate(ControllerStruct *controller, EncoderStruct *encoder)
 
 
 void torque_control(ControllerStruct *controller){
-    float torque_des = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
+	float t_des_nom = controller->kp*(controller->p_des - controller->theta_mech) + controller->t_ff + controller->kd*(controller->v_des - controller->dtheta_mech);
 
-    float iq_des_nom = torque_des / KT_1;
-    if (KT_2 < -0.000001f) iq_des_nom = (-KT_1 + sqrt(KT_1*KT_1 + 4*KT_2*torque_des)) / (2*KT_2);
+    float iq_des_nom;
+    if (KT_2 < 0.000001f) {
+    	controller->t_des = t_des_nom;
+    	iq_des_nom = controller->t_des / KT_1;
+    }
+    else {
+    	controller->t_des = fast_fmaxf(fast_fminf(t_des_nom, controller->t_alg_max), -controller->t_alg_max);
+    	iq_des_nom = fsign(controller->t_des) * (KT_1 - sqrt(fsquare(KT_1) - 4*KT_2*fabs(controller->t_des))) / (2*KT_2);
+    }
+
+    controller->t_des_filt = (1.0f-CURRENT_FILT_ALPHA)*controller->t_des_filt + CURRENT_FILT_ALPHA*controller->t_des;
 
     controller->i_q_des = fast_fmaxf(fast_fminf(iq_des_nom, controller->i_max), -controller->i_max);
     controller->i_d_des = 0.0f;

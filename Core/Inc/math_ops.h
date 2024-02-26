@@ -15,6 +15,8 @@ float fast_fmaxf(float x, float y);
 float fast_fminf(float x, float y);
 float fmaxf3(float x, float y, float z);
 float fminf3(float x, float y, float z);
+float fsign(float x);
+float fsquare(float x);
 //float roundf(float x);
 void limit_norm(float *x, float *y, float limit);
 void limit(float *x, float min, float max);

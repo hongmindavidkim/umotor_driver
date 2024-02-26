@@ -22,6 +22,21 @@ float fminf3(float x, float y, float z){
     /// Returns minimum of x, y, z ///
     return (x < y ? (x < z ? x : z) : (y < z ? y : z));
     }
+
+/**
+ * Return sign of x (+1 if positive, 0 if zero, -1 if negative)
+ */
+float fsign(float x) {
+	if (x==0) return 0;
+	return x/fabs(x);
+}
+
+/**
+ * Return x^2.
+ */
+float fsquare(float x) {
+	return x*x;
+}
 /*
 float roundf(float x){
     /// Returns nearest integer ///

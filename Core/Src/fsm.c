@@ -314,7 +314,7 @@ void run_fsm(FSMStruct * fsmstate){
 		printf(" %-4s %-31s %-5s %-6s %d\n\r", "-", "Encoder Elec Zero", "0", "524288", E_ZERO);
 	    printf(" %-4s %-31s %-5s %-6s %.3f\n\r", "g", "Gear Ratio", "0", "-", GR);
 	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "k", "Linear Torque Constant (Nm/A)", "0", "-", KT_1);
-	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "w", "Quadratic Torque Constant (Nm/A^2)", "-", "0", KT_2);
+	    printf(" %-4s %-31s %-5s %-6s %.5f\n\r", "w", "Quadratic Torque Constant (Nm/A^2)", "0", "-", KT_2);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "o", "Motor Phase Resistance (ohms)", "0.0", "10.0", R_PHASE);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "j", "D-axis inductance (H)", "0", "0.1", L_D);
 	    printf(" %-4s %-31s %-5s %-6s %f\n\r", "e", "Q-axis inductance (H)", "0", "0.1", L_Q);
@@ -428,7 +428,7 @@ void run_fsm(FSMStruct * fsmstate){
 			 printf("KT_1 set to %f\r\n", KT_1);
 			 break;
 		 case 'w':
-			 KT_2 = fminf(atof(fsmstate->cmd_buff), 0.0f);
+			 KT_2 = fmaxf(atof(fsmstate->cmd_buff), 0.0f);		// Positive KT_2 only -- formulating relationship as t = -KT_2 * iq^2 + KT_1 * iq
 			 printf("KT_2 set to %f\r\n", KT_2);
 			 break;
 
@@ -514,7 +514,8 @@ void run_fsm(FSMStruct * fsmstate){
 
 	PPAIRS = 21.0f;
 	GR = 6.0f;
-	KT_OUT = 1.0f;
+	KT_1 = 1.0f;
+	KT_2 = 0.0f;
 	L_D = 0.000003f;
 	L_Q = 0.000003f;
 	R_PHASE = 0.433f;
@@ -542,6 +543,5 @@ void run_fsm(FSMStruct * fsmstate){
 	preference_writer_load(prefs);
 
  }
-
 
 

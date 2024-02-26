@@ -28,6 +28,7 @@ typedef struct{
     float d_int, q_int;                                     // Current error integrals
     int adc_a_offset, adc_b_offset, adc_c_offset, adc_vbus_offset; 		// ADC offsets
     float i_d_des, i_q_des, i_d_des_filt, i_q_des_filt;     // Current references
+    float t_des, t_des_filt, t_alg_max;						// Torques
     int loop_count;                                         // Degubbing counter
     int timeout;                                            // Watchdog counter
     int mode;

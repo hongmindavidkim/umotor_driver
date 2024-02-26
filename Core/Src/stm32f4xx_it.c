@@ -35,6 +35,7 @@
 #include "position_sensor.h"
 #include "hw_config.h"
 #include "user_config.h"
+#include "math_ops.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -278,10 +279,9 @@ void can_tx_rx(void){
 //		HAL_GPIO_TogglePin(LED); //Toggle the state of led on can rx
 		uint32_t TxMailbox;
 
-		float torque_estimate = KT_2*controller.i_q_filt*controller.i_q_filt + KT_1*controller.i_q_filt;
-		float desired_torque = KT_2*controller.i_q_des_filt*controller.i_q_des_filt + KT_1*controller.i_q_des_filt;
+		float t_filt = fsign(controller.i_q_filt) * (-KT_2*fsquare(controller.i_q_filt) + KT_1*fabs(controller.i_q_filt));
 
-		pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, torque_estimate, desired_torque);	// Pack response
+		pack_reply(&can_tx, CAN_ID,  comm_encoder.angle_multiturn[0]/GR, comm_encoder.velocity/GR, t_filt, controller.t_des_filt);	// Pack response
 		HAL_CAN_AddTxMessage(&CAN_H, &can_tx.tx_header, can_tx.data, &TxMailbox);	// Send response
 
 		/* Check for special Commands */
