@@ -17,13 +17,13 @@
 
 #define N_POS_SAMPLES 20		// Number of position samples to store.  should put this somewhere else...
 #define N_LUT 128
-#define LUT_SHIFT 12					// bits to shift for linearizing LUT
+#define LUT_SHIFT 9					// bits to shift for linearizing LUT
 #define LUT_MASK 0x0FFF
 
 typedef struct{
 	uint8_t spi_tx_buff[4];
 	uint8_t spi_rx_buff[4];
-	uint32_t raw;
+	uint16_t raw;
 	float angle_singleturn, old_angle, angle_multiturn[N_POS_SAMPLES], elec_angle, velocity, elec_velocity, ppairs, vel2;
 	float output_angle_multiturn;
 	float filt_prev_mech, filt_prev_elec;

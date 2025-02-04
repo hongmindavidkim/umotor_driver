@@ -29,7 +29,7 @@
 /* SPI encoder */
 #define ENC_SPI			hspi3				// Encoder SPI handle
 #define ENC_CS			GPIOA, GPIO_PIN_15	// Encoder SPI CS pin
-#define ENC_CPR			524288				// Encoder counts per revolution
+#define ENC_CPR			16384			// Encoder counts per revolution
 #define INV_CPR			1.0f/ENC_CPR
 #define ENC_READ_WORD	0xA6000000			// Encoder read command
 
@@ -40,7 +40,7 @@
 #define CAN_H			hcan1				// CAN handle
 
 /* Other hardware-related constants */
-#define I_SCALE				0.0402832f		// Amps per ADC count at 20X amplifier gain
+#define I_SCALE				0.0201416f //0.0402832f		// Amps per ADC count at 20X amplifier gain
 #define V_SCALE 			0.0257812f		// Bus volts per A/D Count (changed to match Mbed fw)
 #define DTC_MAX 			0.94f          	// Max duty cycle
 #define DTC_MIN 			0.0f          	// Min duty cycle

@@ -234,7 +234,7 @@ int main(void)
   comm_encoder.m_zero = M_ZERO;
   comm_encoder.e_zero = E_ZERO;
   comm_encoder.ppairs = PPAIRS;
-  ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
+//  ps_warmup(&comm_encoder, 100);			// clear the noisy data when the encoder first turns on
 
   memcpy(&comm_encoder.offset_lut, &ENCODER_LUT, sizeof(comm_encoder.offset_lut));	// Copy the linearization lookup table
   //for(int i = 0; i<128; i++){printf("%d\r\n", comm_encoder.offset_lut[i]);}
@@ -250,11 +250,11 @@ int main(void)
   HAL_Delay(1);
   drv_write_DCR(drv, 0x0, DIS_GDF_DIS, 0x0, PWM_MODE_3X, 0x0, 0x0, 0x0, 0x0, 0x1); //  TODO: enable gate drive fault?
   HAL_Delay(1);
-  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_20, DIS_SEN_EN, 0x1, 0x1, 0x1, SEN_LVL_1_0); // calibrate shunt amplifiers
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, DIS_SEN_EN, 0x1, 0x1, 0x1, SEN_LVL_1_0); // calibrate shunt amplifiers
   HAL_Delay(1);
   zero_current(&controller); // moved this between the two drv_write_CSACR calls to match mbed fw version
   HAL_Delay(1);
-  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_20, DIS_SEN_DIS, 0x0, 0x0, 0x0, SEN_LVL_1_0); // TODO: enable sensing of overcurrent fault?
+  drv_write_CSACR(drv, 0x0, 0x1, 0x0, CSA_GAIN_40, DIS_SEN_DIS, 0x0, 0x0, 0x0, SEN_LVL_1_0); // TODO: enable sensing of overcurrent fault?
   HAL_Delay(1);
   drv_write_OCPCR(drv, TRETRY_50US, DEADTIME_50NS, OCP_NONE, OCP_DEG_8US, VDS_LVL_1_88); // TODO: reduce VDS level and add OCP_RETRY?
   HAL_Delay(1);
@@ -288,14 +288,14 @@ int main(void)
   delay_us(100);
   HAL_GPIO_WritePin(LED, GPIO_PIN_SET );
   drv_enable_gd(drv);
-  new_offset = check_encoder_init(&comm_encoder, &controller, &comm_encoder_cal);             // status = 1 is good
+//  new_offset = check_encoder_init(&comm_encoder, &controller, &comm_encoder_cal);             // status = 1 is good
   HAL_Delay(100);
   drv_disable_gd(drv);
   HAL_GPIO_WritePin(LED, GPIO_PIN_RESET );
 
 //  E_ZERO = new_offset;
-  comm_encoder.e_zero = new_offset;
-  printf(" Position Sensor Electrical Offset: %d\n\r", comm_encoder.e_zero);
+//  comm_encoder.e_zero = new_offset;
+//  printf(" Position Sensor Electrical Offset: %d\n\r", comm_encoder.e_zero);
 
   // initialize filter here for position sensor
   HAL_Delay(100);

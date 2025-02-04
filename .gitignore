@@ -10,3 +10,4 @@
 *.map
 Debug/*
 Release/*
+/Release/
