@@ -155,7 +155,7 @@ void pack_reply(CANTxMessage *msg, uint8_t id, float p, float v, float t, float 
     msg->data[1] = p_int>>8;
     msg->data[2] = p_int&0xFF;
     msg->data[3] = v_int>>4;
-    msg->data[4] = ((v_int&0xF)<<4) + (t_int>>8);
+    msg->data[4] = ((v_int&0xF)<<4) | (t_int>>8);
     msg->data[5] = t_int&0xFF;
     msg->data[6] = t_des_int>>4;
     msg->data[7] = (t_des_int&0xF)<<4;
